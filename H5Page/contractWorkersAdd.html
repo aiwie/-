@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <!--jquery-->
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+  <!--微信-->
+  <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.3.2.js"></script>
+  <!-- Vant -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@2.12/lib/index.css" />
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6/dist/vue.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vant@2.12/lib/vant.min.js"></script>
+  <!--阿里巴巴图标-->
+  <link rel="stylesheet" href="js/iconfont/iconfont.css" />
+  <!--axios-->
+  <script src="https://cdn.jsdelivr.net/npm/axios@0.21.4/dist/axios.min.js"></script>
+  <script src="./js/converion.js"></script>
+  <title>劳务人员新增</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #F2F2F2;
+    }
+
+    h6 {
+      font-size: 14px;
+      margin: 30px 0 16px 20px;
+      color: #222E6A;
+    }
+
+    .content {
+      padding-top: 20px;
+      margin-bottom: 70px;
+    }
+
+    /* vant步骤条自定义-Start*/
+    .van-steps {
+      width: 80%;
+      margin: 0 auto;
+      background: #F2F2F2;
+      overflow: visible;
+    }
+
+    .van-step--horizontal .van-step__circle-container {
+      padding: 0;
+      background-color: #F2F2F2;
+    }
+
+    .step-item {
+      position: relative;
+    }
+
+    .step-item span {
+      position: absolute;
+      white-space: nowrap;
+      top: 30px;
+      left: -10px;
+      font-size: 12px;
+    }
+
+    .steps-active {
+      color: #349FF1;
+    }
+
+    .van-step--finish {
+      color: #349FF1;
+    }
+
+    .van-step--horizontal .van-step__line {
+      height: 2px;
+      top: 30px;
+      background-color: #e4e4e4;
+    }
+
+    .van-step--process .van-step__line {
+      height: 2px;
+      top: 30px;
+      background: linear-gradient(to right, #349FF1 0%, #349FF1 50%, #C5C8D2 51%, #C5C8D2 100%) !important;
+    }
+
+    .van-step--finish .van-step__line {
+      background-color: #349FF1 !important;
+    }
+
+    /* vant步骤条自定义-End*/
+
+
+    /* 身份证上传-Start*/
+    .idcard {
+      text-align: center;
+      margin-top: 16px;
+    }
+
+    .idcard-icon {
+      width: 100%;
+    }
+
+    .idcard p {
+      font-size: 12px;
+      line-height: 30px;
+      color: #222E6A;
+    }
+
+
+    /* 身份证上传-End*/
+
+
+    /* 证件列表-Start*/
+    .paperitem {
+      margin-top: 10px;
+    }
+
+    .paperitem__title {
+      font-size: 14px;
+      font-weight: bold;
+      color: #222E6A;
+    }
+
+    /* 证件列表-Start*/
+
+
+    /* 下一步-Start*/
+    .button {
+      position: fixed;
+      width: 100%;
+      height: 60px;
+      bottom: 0;
+      background: #F2F2F2;
+      border-top: 1px solid #E2E2E2;
+    }
+
+    .imgbox {
+      width: 260px;
+      height: 166px;
+    }
+
+    /* 下一步-End */
+  </style>
+</head>
+
+<body>
+  <div id="contain">
+    <!-- vant步骤条自定义 -->
+    <van-steps :active="currentSwipeItem" @click-step="onStep">
+      <van-step v-for="(item, index) in steps" :key="index">
+        <template v-slot:active-icon>
+          <!--自定义激活样式-->
+          <div class="step-item" :class="currentSwipeItem === index?'steps-active':''">
+            <div class="steps-active-icon">
+              <i class="iconfont" :class="item.icon" style="font-size: 28px;"></i>
+            </div>
+            <span>{{item.name}}</span>
+          </div>
+        </template>
+        <template v-slot:inactive-icon>
+          <!--自定义未激活样式-->
+          <div class="step-item">
+            <div class="steps-active-icon" :class="currentSwipeItem > index?'steps-active':''">
+              <i class="iconfont" :class="item.icon" style="font-size: 28px;"></i>
+            </div>
+            <span>{{item.name}}</span>
+          </div>
+        </template>
+      </van-step>
+    </van-steps>
+
+    <!--步骤内容-->
+    <div class="content">
+      <!--身份证照片-->
+      <template v-if="currentSwipeItem==0">
+        <h6>请上传身份证照片</h6>
+        <div class="idcard">
+          <div class="idcard-icon">
+            <van-uploader :after-read="uploadIdCardImage" name="idImage" max-size=10000000 @oversize="onOversize">
+              <van-image class="imgbox" width="260px;" height="166px"
+                :src="formData.idImage==''? 'image/idcard-Image.png':formData.idImage" />
+              </van-image>
+              </van-image>
+            </van-uploader>
+          </div>
+          <p>点击上传带头像一面</p>
+        </div>
+        <div class="idcard">
+          <div class="idcard-icon">
+            <van-uploader :after-read="uploadIdCardImage" name="idImageBack" max-size=10000000 @oversize="onOversize">
+              <van-image class="imgbox" width="260px;" height="166px"
+                :src="formData.idImageBack==''? 'image/idcard-ImageidImageBack.png':formData.idImageBack">
+              </van-image>
+            </van-uploader>
+
+          </div>
+          <p>点击上传带国徽的一面</p>
+        </div>
+      </template>
+
+      <!--基本信息-->
+      <template v-if="currentSwipeItem==1">
+        <h6>基本信息</h6>
+        <van-form ref="form" alidate-first>
+          <van-field v-model="formData.name" name="name" label="真实姓名" placeholder="请输入真实姓名"
+            :rules="[{ required: true }]" maxlength="10" required>
+          </van-field>
+
+          <van-field v-model="formData.mobile" name="mobile" label="手机号码" type="tel" placeholder="请输入手机号码"
+            :rules="[{ validator:mobileValidator }]" maxlength="11" required>
+          </van-field>
+
+          <van-field v-model="formData.cardNumber" name="cardNumber" label="身份证号码" placeholder="请输入身份证号码"
+            :rules="[{ validator:cardNumberValidator }]" maxlength="18" required>
+          </van-field>
+
+          <van-field v-model="formData.birthday" name="birthday" label="出生日期" placeholder="请选择出生日期"
+            :rules="[{ validator:birthdayValidator }]" readonly clickable required disabled>
+          </van-field>
+
+          <van-field v-model="gendersname" name="gender" label="性别" placeholder="请选择性别" :rules="[{ required: true }]"
+            readonly clickable required disabled>
+          </van-field>
+
+          <van-field v-model="formData.nativePlace" name="nativePlace" label="籍贯" placeholder="请输入籍贯" maxlength="30">
+          </van-field>
+        </van-form>
+
+        <h6>人脸照片</h6>
+
+        <div style="margin-left: 16px;">
+          <van-uploader :after-read="uploadFaceImage" v-if="formData.faceImage==''"></van-uploader>
+          <van-uploader :after-read="uploadFaceImage" v-if="formData.faceImage!=''">
+            <van-image width="10rem" height="10rem" :src="formData.faceImage">
+            </van-image>
+          </van-uploader>
+
+        </div>
+
+      </template>
+
+      <!--班组信息-->
+      <template v-if="currentSwipeItem==2">
+        <h6>班组信息</h6>
+        <van-cell title="班组" is-link :value="teamname==''?'请选择班组':teamname" @click="teamshowteam = true">
+        </van-cell>
+        <van-popup v-model="teamshowteam" position="bottom">
+          <van-picker show-toolbar :columns="teamcolumns" value-key='teamName' @confirm="teamOnConfirm"
+            @cancel="teamshowteam = false" />
+        </van-popup>
+      </template>
+
+      <!--相关证件-->
+      <template v-if="currentSwipeItem==3">
+        <h6>工种信息</h6>
+        <van-cell title="工种" is-link :value="workname==''?'请选择工种':workname" @click="workshowteam = true">
+        </van-cell>
+        <van-popup v-model="workshowteam" position="bottom">
+          <van-picker show-toolbar :columns="workcolumns" value-key='workTypeName' @confirm="workOnConfirm"
+            @cancel="workshowteam = false" />
+        </van-popup>
+        <!--证件列表-->
+        <template v-for="(item,index) in paperlist">
+          <div class="paperitem">
+            <van-cell-group>
+              <van-cell title="电工证" class="paperitem__title">
+                <span v-if="item.required=='yes'" style="color: red;">必填</spa>
+              </van-cell>
+              <van-cell title="证件有效期" is-link :value="item.validate==''?'选择日期':item.validate"
+                @click="showTime(index,'validate')">
+              </van-cell>
+              <van-cell>
+                <p>{{index.name}}</p>
+                <van-uploader :before-read="uploadPaperImage" v-model="item.images" :name='index' max-count='3'>
+                </van-uploader>
+              </van-cell>
+            </van-cell-group>
+          </div>
+        </template>
+      </template>
+    </div>
+
+    <!--下一步-->
+    <div class="button">
+      <van-row type="flex" justify="space-around" style="height: 100%;align-items:center;">
+        <van-col span="22">
+          <van-button v-if="currentSwipeItem<3" type="info" block round v-on:click="nextStep">下一步</van-button>
+          <van-button v-if="currentSwipeItem==3" type="info" block round v-on:click="submitForm" :disabled="mydisabled">
+            提交
+          </van-button>
+        </van-col>
+      </van-row>
+    </div>
+
+    <!--底部弹出选项-->
+    <van-popup v-model="showCalendar" position="bottom">
+      <van-datetime-picker @confirm="onConfirm" type="date" title="选择年月日" :min-date="minDate" :max-date="maxDate">
+      </van-datetime-picker>
+    </van-popup>
+    <van-popup v-model="gendersShowPicker" position="bottom">
+      <van-picker show-toolbar :columns="genders" title="性别" @confirm="gendersOnConfirm"
+        @cancel="gendersShowPicker = false" value-key="name"></van-picker>
+    </van-popup>
+  </div>
+</body>
+
+<script src="./js/public.js"></script>
+<script>
+  var date = new Date();
+  var year = date.getFullYear();
+  var month = date.getMonth();
+  var strDate = date.getDate();
+  new Vue({
+    el: "#contain",
+    data: {
+      platCode: getUrlParam('platCode'),
+      corpCode: getUrlParam('corpCode'),
+      projectCode: getUrlParam('projectCode'),
+      token: getUrlParam('token'),
+      userCode: getUrlParam('userCode'),
+      apiUrl: 'https://site.tieweizhixing.com/', //接口domain
+      currentSwipeItem: 0, //步骤
+      showCalendar: false, //显示日期选项
+      minDate: new Date(year, month, strDate), //最小日期
+      maxDate: new Date(2050, 0, 1), //最大日期
+      timrDom: { //时间选择对应组件
+        index: '',
+        namm: ''
+      },
+      steps: [{ //步骤名称
+        name: '证件识别',
+        icon: 'icon-1'
+      }, {
+        name: '基础信息',
+        icon: 'icon-a-2'
+      }, {
+        name: '所属班组',
+        icon: 'icon-icon-test'
+      }, {
+        name: '相关证件',
+        icon: 'icon-icon-test1'
+      }],
+      genders: [{ //性别
+        code: 'M',
+        name: '男'
+      }, {
+        code: 'F',
+        name: '女'
+      }],
+      gendersname: '', //性别显示名称
+      gendersShowPicker: false, //显示性别选项
+      teamcolumns: [], //班组
+      teamname: '', //班组显示名称
+      teamshowteam: false, //显示班组选项
+      workcolumns: [], //工种
+      workname: '', //工种显示名称
+      workshowteam: false, //显示工种选项
+      paperlist: [], //证件列表
+      personId: getUrlParam('personId'), //人员id（如新增不传 如修改、离职等必传）
+      formData: { //表单数据
+        name: "", //姓名
+        mobile: "", //电话
+        birthday: "", //出生年月
+        cardNumber: "", //身份证号码
+        gender: "", //性别 M 男; F 女
+        teamId: "", //班组id
+        workId: "", //工种id
+        faceImage: "", //人脸照
+        idImage: '', //身份证正面照
+        idImageBack: '', //身份证反面照
+        status: "on", //劳务人员状态：leave离职,on在职，新增时默认 on
+        nativePlace: '' //籍贯
+      },
+      mydisabled: false
+    },
+    created() {
+    },
+    mounted() {
+      this.getTeamList();
+      this.getWorkList();
+      if (this.personId) {
+        document.title = "劳务人员修改";
+        this.setFormData();
+      }
+    },
+    methods: {
+      setFormData(cardid) { //初始化表单数据，修改人员时
+        var that = this;
+        var params = {
+          projectCode: that.projectCode,
+          personId: that.personId,
+          cardNumber: cardid
+        };
+        axios.post(that.apiUrl + '/projectservice/person/20/getPersonDetail', params)
+          .then(res => {
+            if (res.data.code == 1) {
+              that.formData = res.data.data;
+              that.gendersname = res.data.data.gender == 'M' ? '男' : '女'; //绑定显示性别
+              that.teamname = res.data.data.teamName; //绑定显示班组
+              that.workname = res.data.data.workTypeName; //绑定显示工种
+              that.setPapers(res.data.data.workId);
+            } else {
+              that.$toast('查无此人信息');
+            }
+          })
+          .catch(err => {
+            console.error(err);
+          });
+      },
+      getTeamList() { //获取班组列表
+        var that = this;
+        var params = {
+          token: that.token,
+          projectCode: that.projectCode,
+          pageSize: "999",
+          pageNum: "0"
+        };
+        axios.post(that.apiUrl + 'projectservice/team/20/getTeamList', params)
+          .then(res => {
+            that.teamcolumns = res.data.data.list;
+          })
+          .catch(err => {
+            console.error(err);
+          })
+      },
+      async getWorkList() { //获取工种列表
+        var that = this;
+        var params = {
+          token: that.token,
+          projectCode: that.projectCode,
+          platCode: this.platCode,
+          pageSize: "999",
+          pageNum: "0"
+        };
+        await axios.post(that.apiUrl + 'projectservice/work/20/getWorkList', params)
+          .then(res => {
+            that.workcolumns = res.data.data.list;
+          })
+          .catch(err => {
+            console.error(err);
+          })
+      },
+      nextStep() { //下一步
+        var that = this;
+        if (that.currentSwipeItem == 0) {
+          if (that.formData.idImage == "" || that.formData.idImageBack == "") {
+            that.$toast('请上传身份证件！');
+            return;
+          } else {
+            that.currentSwipeItem++;
+            return;
+          }
+        }
+        if (that.currentSwipeItem == 1) {
+          that.$refs.form.validate().then(() => {
+            if (that.formData.faceImage == "") {
+              that.$toast('请上传人脸照片');
+              return;
+            } else {
+              that.currentSwipeItem++;
+              return;
+            }
+          })
+        }
+        if (that.currentSwipeItem == 2) {
+          if (that.formData.teamId == "") {
+            that.$toast('请选择班组！');
+            return;
+          } else {
+            that.currentSwipeItem++;
+            return;
+          }
+        }
+      },
+      onStep(index) { //点击步骤
+        var that = this;
+        if (that.currentSwipeItem > index) {
+          that.currentSwipeItem = index
+        }
+      },
+      uploadIdCardImage(file, detail) { //身份证上传
+        var that = this;
+        imageConversion.compressAccurately(file.file, 200).then(item => {
+
+          var formData = new FormData();
+          formData.append("token", that.token);
+          formData.append("uploadPath", 'faceImage');
+          formData.append("myfiles0", item, file.file.name);
+          axios.post(that.apiUrl + "file-service/upload/uploadfiles", formData)
+            .then(res => {
+
+              if (detail.name == "idImage") {
+                that.formData.idImage = res.data.data.myfiles0;
+              }
+              if (detail.name == "idImageBack") {
+                that.formData.idImageBack = res.data.data.myfiles0;
+              }
+            })
+            .catch(err => {
+              Toast.$fail(err);
+            })
+        })
+
+
+
+
+
+      },
+      onOversize() { //验证上传文件
+        this.$toast('文件不能超过10M');
+      },
+      uploadFaceImage(file) { //人脸头像上传
+        var that = this;
+        imageConversion.compressAccurately(file.file, 200).then(item => {
+          var formData = new FormData();
+          formData.append("token", that.token);
+          formData.append("uploadPath", 'faceImage');
+          formData.append("myfiles0", item, file.file.name);
+          axios.post(that.apiUrl + "file-service/upload/uploadfiles", formData)
+            .then(res => {
+              console.log(res.data.data.myfiles0)
+              that.formData.faceImage = res.data.data.myfiles0;
+            })
+            .catch(err => {
+              Toast.$fail(err);
+            })
+        })
+
+      },
+      uploadPaperImage(file, detail) { //上传证件图片
+        var that = this;
+        imageConversion.compressAccurately(file, 200).then(item => {
+          var formData = new FormData();
+          formData.append("token", that.token);
+          formData.append("uploadPath", 'paperImage');
+          formData.append("myfiles0", item, file.name);
+          axios.post(that.apiUrl + "file-service/upload/uploadfiles", formData)
+            .then(res => {
+              var index = detail.name;
+              var data = {
+                url: res.data.data.myfiles0
+              };
+              that.paperlist[index].images.push(data)
+              console.log(that.paperlist)
+            })
+            .catch(err => {
+              Toast.$fail(err);
+            })
+
+        })
+
+      },
+      showTime(index, name) { //打开时间选项,index:小标，name：名称
+        this.timrDom.index = index;
+        this.timrDom.name = name;
+        this.showCalendar = true;
+      },
+      onConfirm(date, detail) { //选择日期
+        var that = this;
+        that.showCalendar = false;
+        var date = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+        if (that.timrDom.index === '') {
+          if (that.timrDom.name == 'birthday') {
+            that.formData.birthday = date;
+          }
+        } else {
+          var index = that.timrDom.index;
+          if (that.timrDom.name == 'validate') {
+            that.paperlist[index].validate = date;
+          }
+        }
+      },
+      gendersOnConfirm(time) { //选择性别
+        var that = this;
+        that.gendersname = time.name;
+        that.formData.gender = time.code;
+        that.gendersShowPicker = false;
+      },
+      nameValidator(val) { //姓名验证
+        return val.length >= 1 && val.length <= 10;
+      },
+      mobileValidator(val) { //手机号验证
+        let newval = val
+        // const reg = /[\u4e00-\u9fa5_a-zA-Z]/ig
+        const newReg = /[0-9]/ig
+        if (newval.trim()) {
+          newval = newval.match(newReg)
+          if (newval) {
+            newval = newval.join("")
+            this.formData.mobile = newval.trim()
+          } else {
+            this.formData.mobile = ""
+          }
+        }
+        return /^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/.test(newval);
+      },
+      cardNumberValidator(val) { //身份证验证
+        var that = this;
+        const reg = /[\u4e00-\u9fa5_a-wA-WY-Zy-z]/ig
+        const newreg = /[0-9xX]/ig
+        if (val.trim()) {
+          val = val.match(newreg)
+          if (val) {
+            val = val.join('')
+            this.formData.cardNumber = val.trim()
+          } else {
+            this.formData.cardNumber = ''
+          }
+        }
+
+        var falg = /(^\d{18}$)|(^\d{17}(\d|X|x)$)/.test(val);
+
+        if (falg) {
+          var birthday = "";
+          // if (that.formData.birthday == "") {
+          if (val.length == 15) {
+            birthday = "19" + val.substr(6, 6);
+          } else if (val.length == 18) {
+            birthday = val.substr(6, 8);
+          }
+          that.formData.birthday = birthday.replace(/(.{4})(.{2})/, "$1-$2-");
+          // }
+
+          // if (that.gendersname == "") {
+          if (parseInt(val.substr(16, 1)) % 2 == 1) {
+            that.gendersname = '男';
+            that.formData.gender = 'M';
+          } else {
+            that.gendersname = '女';
+            that.formData.gender = 'F';
+          }
+          // }
+
+        }
+        return falg;
+      },
+      birthdayValidator(val) { //日期验证
+        arr = val.split("-");
+        if (arr.length == 3) {
+          intYear = parseInt(arr[0], 10);
+          intMonth = parseInt(arr[1], 10);
+          intDay = parseInt(arr[2], 10);
+          if (isNaN(intYear) || isNaN(intMonth) || isNaN(intDay)) {
+            return false;
+          }
+          if (intYear > 2100 || intYear < 1900 || intMonth > 12 || intMonth < 0 || intDay > 31 ||
+            intDay < 0) {
+            return false;
+          }
+          if ((intMonth == 4 || intMonth == 6 || intMonth == 9 || intMonth == 11) && intDay > 30) {
+            return false;
+          }
+          if (intYear % 100 == 0 && intYear % 400 || intYear % 100 && intYear % 4 == 0) {
+            if (intDay >
+              29) return false;
+          } else {
+            if (intDay > 28) return false;
+          }
+          return true;
+        }
+        return false;
+      },
+      teamOnConfirm(date) { //选择班组
+        var that = this;
+        that.teamshowteam = false;
+        that.formData.teamId = date.teamId.toString();
+        that.teamname = date.teamName;
+      },
+      workOnConfirm(date) { //选择工种
+        var that = this;
+        that.workshowteam = false;
+        that.formData.workId = date.workId.toString();
+        that.workname = date.workTypeName;
+        //绑定证件
+        that.setPapers(date.workId);
+      },
+      setPapers(workid) { //绑定证件信息
+        var that = this;
+        that.paperlist = []; //清除已绑定的证件信息
+        //获取工种绑定的证件信息
+        var works = that.workcolumns.find(function (item) {
+          return item.workId == parseInt(workid)
+        })
+        if (works == null || works.papers == null) {
+          return;
+        };
+        var paperitem = JSON.parse(works.papers);
+        paperitem.forEach(item => {
+          var papers;
+          var images = [];
+          //获取已绑定证件
+          if (that.formData.workPapers != null) {
+            papers = that.formData.workPapers.find(function (workpaper) {
+              return workpaper.workname === item.name
+            })
+          };
+          //设置已绑定图片
+          if (papers) {
+            var imagesjson = papers.images.split(',');
+            imagesjson.forEach(imgitem => {
+              var data = {
+                url: imgitem
+              };
+              images.push(data)
+            });
+          }
+          var data = {
+            name: item.name,
+            required: item.required,
+            validate: papers ? papers.validate : '',
+            images: images
+          };
+          that.paperlist.push(data)
+        });
+      },
+      submitForm() { //提交
+        this.mydisabled = true
+        var that = this;
+        //验证是否选择共种
+        if (that.formData.workId == "") {
+          that.$toast('请选择工种！');
+          this.mydisabled = false
+          return;
+        };
+        var params = that.setFormParams();
+        if (params == false) {
+          that.$toast('请填写必要证件信息！');
+          this.mydisabled = false
+        }
+
+        axios.post(that.apiUrl + "projectservice/person/20/addPerson", params)
+          .then(res => {
+            if (res.data.code == '1') {
+              if (!that.personId) {
+                that.$toast.success('添加成功！');
+              } else {
+                that.$toast.success('修改成功！');
+              }
+              setTimeout(() => {
+                // window.location.href = 'contractWorkers.html' + '?platCode=' + this.platCode + '&projectCode=' + this.projectCode + '&token=' + this.token + '&corpCode=' + this.corpCode + '&userCode=' + this.userCode
+                window.history.back(-1)
+              }, 1000)
+
+            } else {
+              that.$toast(res.data.msg);
+              this.mydisabled = false
+              return;
+            }
+
+          })
+          .catch(err => {
+            this.mydisabled = false
+            console.error(err);
+          })
+      },
+      setFormParams() { //设置表单参数,并且验证证件
+        var that = this;
+        var params = that.formData;
+        var workPapers = [];
+        params["token"] = that.token;
+        params["projectCode"] = that.projectCode;
+        //验证是否上传了必要证件
+        for (let i = 0; i < that.paperlist.length; i++) {
+          var item = that.paperlist[i];
+          //验证必填证件数据
+          if (item.required == 'yes' && (item.validate == '' || item.images.length <= 0)) {
+            return false;
+          }
+          var img = "";
+          item.images.forEach(element => {
+            img += element.url + ",";
+          });
+          if (img.length > 0) {
+            img = img.substr(0, img.length - 1);
+          }
+          if (item.validate != '' && item.images.length >= 0) {
+            var workPaper = {
+              workname: item.name,
+              images: img,
+              validate: item.validate
+            };
+            workPapers.push(workPaper);
+          }
+        }
+        params["workPapers"] = workPapers;
+        return params;
+      },
+    }
+  });
+</script>
+
+
+</html>

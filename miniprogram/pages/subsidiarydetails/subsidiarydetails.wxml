@@ -1,0 +1,109 @@
+<!--pages/subsidiarydetails/subsidiarydetails.wxml-->
+<wxs src="../../utils/filter.wxs" module="filter"></wxs>
+<view class="page">
+    <!--基本信息-->
+    <view class="top">
+        <view style="border-bottom: 1px solid rgba(112, 112, 112, .2);">
+            <view class="top-name">
+                <text class="iconfont icon-qiye top-icon" />
+                <text>{{subcorpDetail.corpName}}</text>
+            </view>
+        </view>
+        <view class="panel__hd">
+            <text>基本信息</text>
+        </view>
+        <view class="panel_box">
+            <view class="list">
+                <view class="list-formTitle">
+                    <text>子公司名称</text>
+                </view>
+                <view class="list-formValue">
+                    <text>{{subcorpDetail.corpName}}</text>
+                </view>
+            </view>
+            <view class="list">
+                <view class="list-formTitle">
+                    <text>子公司全称</text>
+                </view>
+                <view class="list-formValue">
+                    <text>{{subcorpDetail.corpFullName}}</text>
+                </view>
+            </view>
+            <view class="list">
+                <view class="list-formTitle">
+                    <text>公司地址</text>
+                </view>
+                <view class="list-formValue">
+                    <text>{{subcorpDetail.address}}</text>
+                </view>
+            </view>
+            <view class="list">
+                <view class="list-formTitle">
+                    <text>联系人</text>
+                </view>
+                <view class="list-formValue">
+                    <text>{{subcorpDetail.contactName}}</text>
+                </view>
+            </view>
+            <view class="list">
+                <view class="list-formTitle">
+                    <text>联系电话</text>
+                </view>
+                <view class="list-formValue">
+                    <text>{{subcorpDetail.contactMobile}}</text>
+                </view>
+            </view>
+        </view>
+    </view>
+
+    <!--授权信息-->
+    <view class="content">
+        <view class="weui-flex">
+            <view class="weui-flex__item content-title">
+                <text>授权信息</text>
+            </view>
+            <view class="weui-flex__item content-time">
+                <text>有效期</text><text>{{filter.formatTime(subcorpDetail.effectiveDate)}}~{{filter.formatTime(subcorpDetail.expireDate)}}</text>
+            </view>
+        </view>
+        <view class="content-details">
+            <view class="weui-flex">
+                <view class="weui-flex__item content-details-title">
+                    <text>项目数</text><text>{{subcorpDetail.usedProjectNumber+subcorpDetail.allowProjectNumber}}</text>
+                </view>
+                <view class="weui-flex__item content-details-title">
+                    <view class="establish-10"></view><text>在建</text><text>{{subcorpDetail.allowProjectNumber}}</text>
+                </view>
+                <view class="weui-flex__item content-details-title">
+                    <view class="notestablish-10"></view><text>建立</text><text>{{subcorpDetail.usedProjectNumber}}</text>
+                </view>
+            </view>
+            <view class="content-details-list">
+                <view class="weui-flex" style=" flex-wrap: wrap;">
+                    <block wx:for="{{subcorpDetail.allowProjectNumber}}" wx:key="index">
+                        <view class="weui-flex_wrap " style=" flex: 0 0 10%;">
+                            <view class="establish-14"></view>
+                        </view>
+                    </block>
+                    <block wx:for="{{subcorpDetail.usedProjectNumber}}" wx:key="index">
+                        <view class="weui-flex_wrap " style=" flex: 0 0 10%;">
+                            <view class="notestablish-14"></view>
+                        </view>
+                    </block>
+                </view>
+            </view>
+        </view>
+        <!-- 更变列表 -->
+        <view class="changecontent">
+            <view class="weui-flex weui-flex_wrap">
+                <block wx:for="{{subcorpDetail.permissionList}}" wx:key="index" wx:for-item="item">
+                    <view class="weui-flex__item weui-flex__item_flex">
+                        <view class="changecontent-list">
+                            <text>{{item.moduleName}}</text>
+                        </view>
+                    </view>
+                </block>
+            </view>
+        </view>
+    </view>
+</view>

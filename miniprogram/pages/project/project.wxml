@@ -1,0 +1,106 @@
+<!--pages/project/project.wxml-->
+<wxs src="../../utils/filter.wxs" module="filter"></wxs>
+
+<view class="page">
+    <!-- 头部 -->
+    <view class="top">
+        <image class="top-img" src="/images/index_top.png"></image>
+        <view class="weui-flex">
+            <view class="weui-flex__item top-border">
+                <view class="weui-flex__item ">
+                    <view class="weui-flex">
+                        <view class="weui-flex__item">
+                            <view class="top-list-title">
+                                <text>项目</text>
+                            </view>
+                            <view class="top-list-count">
+                                <text style="color:#027ac5;">{{statGeneral.projectThisYear}}</text>
+                            </view>
+                        </view>
+                        <view class="weui-flex__item">
+                            <view class="top-list-new">
+                                <text decode="true">本月&nbsp;</text><text>+{{statGeneral.projectThisMonth}}</text>
+                            </view>
+                        </view>
+                    </view>
+                </view>
+            </view>
+        </view>
+    </view>
+
+    <!--统计图-->
+    <view class="chartcontent">
+        <view class="chartcontent-title">
+            <text>每月项目变化</text>
+        </view>
+        <view class="chartcontent-content">
+            <ec-canvas id="csr_mychart" canvas-id="mychart-line" ec="{{ csr_ec }}"></ec-canvas>
+        </view>
+    </view>
+
+    <!--项目详情-->
+    <view class="footer">
+        <view class="footer-title">
+            <text>项目</text>
+        </view>
+        <!--搜索框-->
+        <view class="searchbar">
+            <view class="weui-search-bar weui-search-bar_focusing" id="searchBar">
+                <form class="weui-search-bar__form">
+                    <view class="weui-search-bar__box">
+                        <i class="weui-icon-search"></i>
+                        <input type="text" class="weui-search-bar__input" placeholder="请输入关键字" value="{{inputVal}}"
+                            focus="{{inputShowed}}" bindinput="inputTyping" bindconfirm="search" />
+                        <span class="weui-icon-clear" wx:if="{{inputVal.length > 0}}" bindtap="clearInput"></span>
+                    </view>
+                    <label class="weui-search-bar__label" bindtap="showInput">
+                        <i class="weui-icon-search"></i>
+                        <span class="weui-search-bar__text">搜索</span>
+                    </label>
+                </form>
+            </view>
+        </view>
+        <!--项目列表-->
+        <view class="footer-lists">
+            <view class="footer-list" wx:for="{{projectList}}" wx:key="index" wx:for-item="item">
+                <view class="weui-flex">
+                    <view class="weui-flex__item">
+                        <view class="footer-list_title" data-projectCode="{{item.projectCode}}" catchtap="projectdetails">
+                            <text>{{item.projectName}}</text>
+                        </view>
+                        <view class="footer-list_info">
+                            <text>立项日期：</text>
+                            <text>{{filter.formatTime(item.createDate)}}</text>
+                        </view>
+                        <view class="footer-list_info">
+                            <text decode="true">联&nbsp;&nbsp;系&nbsp;&nbsp;人：</text>
+                            <text>{{item.contactName}}</text>
+                        </view>
+                        <view class="footer-list_info">
+                            <text>联系电话：</text>
+                            <text>{{item.contactMobile}}</text>
+                        </view>
+                    </view>
+                    <view class="weui-flex__item flex-width200rpx">
+                        <view class="accessequipment">
+                            <view class="accessequipment_title">
+                                <text>{{item.deviceCount}}</text>
+                            </view>
+                            <view class="accessequipment_count">
+                                <text>接入设备</text>
+                            </view>
+                        </view>
+
+                    </view>
+                </view>
+                <view class="authorization">
+                    <block wx:for="{{item.permissionList}}" wx:key="permission" wx:for-item="permission">
+                        <view class="authorization-list">
+                            <text>{{permission.moduleName}}</text>
+                        </view>
+                    </block>
+                </view>
+            </view>
+        </view>
+    </view>
+</view>

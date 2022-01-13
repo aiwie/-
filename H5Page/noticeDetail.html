@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <!--微信-->
+    <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.3.2.js"></script>
+    <!-- Vant -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@2.12/lib/index.css" />
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6/dist/vue.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vant@2.12/lib/vant.min.js"></script>
+    <!--阿里巴巴图标-->
+    <link rel="stylesheet" href="js/iconfont/iconfont.css" />
+    <!--axios-->
+    <script src="https://cdn.jsdelivr.net/npm/axios@0.21.4/dist/axios.min.js"></script>
+    <!--moment时间过滤-->
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.js"></script>
+    <script src="./js/public.js"></script>
+    <title>通知公告详情</title>
+    <style>
+        body {
+            background: #F2F2F2;
+        }
+
+        #contain {
+            margin: 0 16px;
+        }
+
+        /*通知-Start*/
+
+        .notice-title {
+            color: #132697;
+            text-align: center;
+        }
+
+        .content {
+            padding: 1px 0 20px 0;
+            background: #FFFFFF;
+            border-radius: 8px;
+
+        }
+
+        .notice-brief {
+            position: relative;
+            width: 90%;
+            margin-top: 16px;
+            padding-left: 10px;
+            line-height: 28px;
+            color: #FFFFFF;
+            background-color: #FCB044;
+            font-size: 12px;
+        }
+
+        .notice-brief::after {
+            content: "";
+            position: absolute;
+            height: 0;
+            width: 0;
+            right: 0;
+            border-top: 14px solid #FCB044;
+            border-bottom: 14px solid #FCB044;
+            border-right: 20px solid #FFFFFF;
+        }
+
+        .notice-body {
+            margin-left: 16px;
+            margin-right: 16px;
+            font-size: 12px;
+        }
+
+        .notice-footer {
+            text-align: right;
+            margin-right: 16px;
+            font-size: 12px;
+            color: #222E6A;
+        }
+
+        /*通知-End*/
+    </style>
+</head>
+
+<body>
+    <div id="contain">
+        <!--通知标题-->
+        <div class="notice-title">
+            <h3>{{notice.title}}</h3>
+        </div>
+        <!--通知内容-->
+        <div class="content">
+            <div class="notice-brief">
+                <span>{{notice.descr}}</span>
+            </div>
+            <div class="notice-body" v-html="notice.content"></div>
+
+            <div class="notice-footer">
+                <p>
+                    <span>发布人：</span>
+                    <span>{{notice.userName}}</span>
+                </p>
+                <p>
+                    <span>发布时间：</span>
+                    <span>{{notice.createDate|datefmt}}</span>
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script>
+    new Vue({
+        el: "#contain",
+        data: {
+            apiUrl: 'https://site.tieweizhixing.com/',
+            notice: [],//公告详情
+            noticeId:'',
+        },
+        created() { 
+           
+            this.noticeId = getUrlParam('noticeId')
+            console.log(this.noticeId)
+        },
+        mounted() {
+            this.getNoticeById();
+        },
+        methods: {
+            getNoticeById() {//获取通知公告详情
+                var that = this;
+                var params = {
+                    "noticeId": this.noticeId 
+                };
+                axios.post(that.apiUrl + "/oaservice/notice/20/getNoticeById", params)
+                    .then(res => {
+                        if (res.data.code == '1') {
+                            that.notice = res.data.data;
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                    })
+            },
+        },
+        filters:{     datefmt(date) {
+            if (date) {
+                return this.moment(date).format('YYYY年MM月DD日');
+            } else {
+                return "";
+            }
+        }}
+   
+    });
+</script>
+
+
+</html>

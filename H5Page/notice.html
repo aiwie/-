@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <!--微信-->
+  <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.3.2.js"></script>
+  <!-- Vant -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@2.12/lib/index.css" />
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6/dist/vue.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vant@2.12/lib/vant.min.js"></script>
+  <!--阿里巴巴图标-->
+  <link rel="stylesheet" href="js/iconfont/iconfont.css" />
+  <!--axios-->
+  <script src="https://cdn.jsdelivr.net/npm/axios@0.21.4/dist/axios.min.js"></script>
+  <!--moment时间过滤-->
+  <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.js"></script>
+  <title>通知公告</title>
+  <style>
+    body {
+      background: #F2F2F2;
+    }
+
+    #contain {
+      margin: 0 15px;
+    }
+
+    /* 通知列表-Start*/
+
+    .notice {
+      margin-top: 15px;
+      background: #FFFFFF;
+      box-shadow: 0px 3px 6px rgba(94, 94, 141, 0.2);
+      opacity: 1;
+      border-radius: 8px;
+    }
+
+    .notice-box {
+      padding: 14px 14px 12px 17px;
+    }
+
+    .notice-title {
+      position: relative;
+      margin-left: 10px;
+      line-height: 24px;
+      font-size: 14px;
+    }
+
+    .notice-title.primary::before {
+      /*通知*/
+      content: " ";
+      position: absolute;
+      top: 38%;
+      left: -10px;
+      width: 4px;
+      height: 4px;
+      border-radius: 20px;
+      border: 1px solid #4CB75A;
+      background-color: #4CB75A;
+    }
+
+    .notice-title.info::before {
+      /*公告*/
+      content: " ";
+      position: absolute;
+      top: 38%;
+      left: -10px;
+      width: 4px;
+      height: 4px;
+      border-radius: 20px;
+      border: 1px solid #349FF1;
+      background-color: #349FF1;
+    }
+
+    .notice-content {
+      margin-top: 13px;
+      font-size: 12px;
+    }
+
+    .van-divider {
+      margin: 10px 0;
+    }
+
+    .notice-footer {
+      font-size: 12px;
+      color: #646A73;
+    }
+
+    /* 通知列表-End*/
+  </style>
+</head>
+
+<body>
+  <div id="contain">
+    <!--通知列表-->
+    <template v-for="(item,index) in noticelist">
+      <div class="notice" @click="roblemReport(item.noticeId)">
+        <div class="notice-box">
+          <!--头部标题-->
+          <van-row type="flex" justify="space-between">
+            <van-col class="notice-title" :class="item.noticeType=='notice'?'primary':'info'  ">
+              {{item.title}}
+            </van-col>
+            <van-col span="4" style="text-align: right;">
+              <van-button style="width: 100%; max-width: 60px;" round :type="item.noticeType=='notice'?'primary':'info'"
+                size="mini">
+                <p v-if="item.noticeType=='notice'">通知</p>
+                <p v-if="item.noticeType=='announce'">公告</p>
+              </van-button>
+            </van-col>
+          </van-row>
+          <!--描述-->
+          <div class="notice-content">
+            {{item.descr}}
+          </div>
+          <van-divider></van-divider>
+          <van-row type="flex" justify="space-between" class="notice-footer">
+            <van-col>
+              {{item.userName}}
+            </van-col>
+            <van-col>
+              {{item.createDate}}
+            </van-col>
+          </van-row>
+        </div>
+      </div>
+    </template>
+  </div>
+</body>
+
+<script src="./js/public.js"></script>
+<script>
+  new Vue({
+    el: "#contain",
+    data: {
+      platCode: getUrlParam('platCode'),
+      corpCode: getUrlParam('corpCode'),
+      projectCode: getUrlParam('projectCode'),
+      token: getUrlParam('token'),
+      userCode: getUrlParam('userCode'),
+      apiUrl: 'https://site.tieweizhixing.com/',
+      noticelist: [],//通知详情
+    },
+    created() { },
+    mounted() {
+      this.getNoticesByUser();
+    },
+    methods: {
+      roblemReport(val) {
+        let severUrl = "http://127.0.0.1:5500/" // 测试数据
+        let strUrl = "noticeDetail.html"
+        let roblemReportHtml = strUrl + '?platCode=' + this.platCode + '&projectCode=' + this.projectCode + '&token=' + this.token + '&corpCode=' + this.corpCode + '&userCode=' + this.userCode + '&noticeId=' + val
+        window.location.href = roblemReportHtml
+      },
+      getNoticesByUser() {//获取通知公告
+        var that = this;
+        var params = {
+          'platCode': that.platCode,
+          'corpCode': that.corpCode,
+          'projectCode': that.projectCode,
+          "title": ""
+        };
+        axios.post(that.apiUrl + "/oaservice/notice/20/getNoticesByUser", params)
+          .then(res => {
+            if (res.data.code == '1') {
+              that.noticelist = res.data.data.list;
+            }
+          })
+          .catch(err => {
+            console.error(err);
+          })
+      },
+
+    }
+  });
+</script>
+
+
+</html>

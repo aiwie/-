@@ -1,0 +1,15 @@
+/* pages/privacypolicy/privacypolicy.wxss */
+view{
+  font-size: 22rpx;
+}
+.priv-bg{
+  padding: 10px 20px;
+}
+.pri-title{
+  font-size: 24rpx;
+  font-weight: bold;
+  padding: 10rpx 0;
+}
+.pri-weit{
+  font-weight: bold;
+}

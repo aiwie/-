@@ -1,0 +1,131 @@
+/* pages/emcs/emcs.wxss */
+.top-img {
+    z-index: -1;
+    position: absolute;
+    overflow: hidden;
+    top: 0;
+    width: 100%;
+    opacity: 1;
+}
+
+/* banner-Start */
+.banner {
+    margin: 40rpx 24rpx 0 30rpx;
+    height: 388rpx;
+    overflow: hidden;
+    background: #EDF1FE;
+    box-shadow: 10rpx 20rpx 40rpx rgba(94, 94, 141, 0.2);
+    opacity: 1;
+    border-radius: 24rpx;
+}
+
+.banner_cell {
+    padding-top: 34rpx;
+    text-align: center;
+}
+
+.banner_cell text {
+    font-size: 32rpx;
+    font-weight: bold;
+    line-height: 0px;
+    color: #222E6A;
+    opacity: 1;
+}
+
+.banner_cell_echarts {
+    margin: 12rpx 0 0 40rpx;
+    width: 614rpx;
+    height: 248rpx;
+    background: #FFFFFF;
+    opacity: 1;
+    border-radius: 8rpx;
+}
+
+/* banner-End */
+
+
+/* 卡片-Start */
+.cards {
+    margin-left: 30rpx;
+    margin-right: 28rpx;
+}
+
+.card {
+    overflow: hidden;
+    margin-top: 36rpx;
+    margin-bottom: 36rpx;
+    box-shadow: 5px 10px 20px rgba(94, 94, 141, 0.2);
+}
+
+.card-title {
+    position: relative;
+    height: 84rpx;
+    opacity: 1;
+    text-align: center;
+    border-radius: 12px 12px 0px 0px;
+}
+
+.card-title-icon {
+    position: absolute;
+    top: 20rpx;
+    left: 40rpx;
+    width: 44rpx;
+    height: 44rpx;
+    color: RGBA(34, 46, 106, 1);
+    border-radius: 0px;
+}
+
+.card-title-text {
+    line-height: 84rpx;
+    font-weight: bold;
+    font-size: 32rpx;
+    color: #FFFFFF;
+}
+
+.card-content {
+    height: 304rpx;
+    background: #FFFFFF;
+    box-shadow: 10rpx 20rpx 40rpx rgba(94, 94, 141, 0.2);
+    border-radius: 0px 0px 12px 12px;
+}
+
+.card-content-box {
+    padding: 40rpx 38rpx 0 40rpx;
+    text-align: left;
+}
+
+.content-box_text1 {
+    display: block;
+    font-size: 24rpx;
+    color: #222E6A;
+}
+
+.content-box_text2 {
+    display: block;
+    font-size: 40rpx;
+    font-weight: bold;
+}
+
+.content-box_text3 {
+    margin-left: 10rpx;
+    margin-right: 10rpx;
+    font-size: 24rpx;
+    color: #222E6A;
+}
+
+.content-box_text4 {
+    font-size: 40rpx;
+    font-weight: bold;
+    color: #222E6A;
+   
+}
+
+.contentline {
+    height: 2rpx;
+    margin: 26rpx 40rpx 0 40rpx;
+    background: #222E6A;
+    opacity: 0.2;
+}
+
+/* 卡片-End */
+

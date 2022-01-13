@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <!--jquery-->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <!--微信-->
+    <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.3.2.js"></script>
+    <!-- Vant -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@2.12/lib/index.css" />
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6/dist/vue.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vant@2.12/lib/vant.min.js"></script>
+    <!--阿里巴巴图标-->
+    <link rel="stylesheet" href="js/iconfont/iconfont.css" />
+    <!--axios-->
+    <script src="https://cdn.jsdelivr.net/npm/axios@0.21.4/dist/axios.min.js"></script>
+    <!--moment时间过滤-->
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.js"></script>
+    <title>在场人员</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #F2F2F2;
+        }
+
+        #contain {
+            margin: 0 15px;
+        }
+
+
+        /* 条件选择-Start */
+        .van-search {
+            padding: 10px 0;
+        }
+
+        .van-search__content {
+            border: 1px solid rgba(112, 112, 112, 0.2);
+            background: #FFFFFF;
+        }
+
+        .search {
+            top: 0;
+            height: 35px;
+            padding: 14px 14px 12px 15px;
+            background: #FFFFFF;
+            border-bottom: 1px solid #E2E2E2;
+        }
+
+        .search-select {
+            height: 34px;
+            margin: 10px;
+            font-size: 14px;
+            color: #646A73;
+            border: 1px solid rgba(112, 112, 112, 0.2);
+            opacity: 1;
+            border-radius: 20px;
+        }
+
+        .search-time {
+            margin-top: 10px;
+            font-size: 10px;
+            line-height: 18px;
+            color: #646A73;
+            text-align: right;
+        }
+
+        /* 条件选择-End */
+
+
+        /* 现场人员统计-Start */
+        .card {
+            overflow: hidden;
+            margin-top: 10px;
+            background: #FFFFFF;
+            border-radius: 12px;
+        }
+
+        .card-title {
+            position: relative;
+            height: 42px;
+            opacity: 1;
+            background: linear-gradient(258deg, #6A85F5 0%, #A298FE 100%);
+            text-align: center;
+            border-radius: 12px 12px 0px 0px;
+        }
+
+        .card-title-icon {
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            font-size: 22px;
+            color: RGBA(34, 46, 106, 1);
+            border-radius: 0px;
+        }
+
+        .card-title-text {
+            line-height: 42px;
+            font-weight: bold;
+            font-size: 16px;
+            color: #FFFFFF;
+        }
+
+        .card-content {
+            padding: 39px 18px 40px 18px;
+        }
+
+        .card-content div {
+            padding: 14px 0 14px 12px;
+            line-height: 22px;
+            border-radius: 8px;
+        }
+
+        .card-content-labour {
+            background: linear-gradient(180deg, #FFFFFF 0%, #D8DEFE 100%);
+        }
+
+        .card-content-company {
+            background: linear-gradient(180deg, #FFFFFF 0%, #D0EBFE 100%);
+        }
+
+        .card-content-other {
+            background: linear-gradient(180deg, #FFFFFF 0%, #EFE8FF 100%);
+        }
+
+        /* 现场人员统计-End */
+
+
+        /* 现场人员详情-Start */
+        .tabs {
+            margin: 16px -15px;
+        }
+
+        .van-tab__text {
+            font-weight: bold;
+        }
+
+        .van-tabs__line {
+            background-color: #2040FF;
+        }
+
+        .staff-card {
+            margin: 10px 14px 0 15px;
+            padding: 10px 0 10px 9px;
+            background: #FFFFFF;
+            border-radius: 4px;
+        }
+
+        .staff-team {
+            margin: 6px 0 0 14px;
+            font-size: 12px;
+        }
+
+        .staff-phone {
+            margin: 6px 0 0 14px;
+            font-size: 12px;
+        }
+
+        /* 现场人员详情-End */
+    </style>
+</head>
+
+<body>
+    <div id="contain">
+        <!--条件选择-->
+        <van-row type="flex" justify="space-between">
+            <!--搜索框-->
+            <van-col span="18">
+                <van-search v-model="searchvalue" shape="round" @search="onSearch" background="#F2F2F2" placeholder="请输入搜索内容"></van-search>
+            </van-col>
+            <!--班组选择-->
+            <van-col span="6">
+                <div class="search-time" @click="timeshow = true">
+                    <p>当前时间</p>
+                    <p>{{timevalue|datefmt}} <i class="iconfont icon-zhijiaosanjiaoxing" style="font-size: 10px;"></i>
+                    </p>
+                </div>
+            </van-col>
+        </van-row>
+
+        <!--现场人员统计卡片-->
+        <div class="card">
+            <div class="card-title">
+                <i class="iconfont icon-geren card-title-icon"></i>
+                <span class="card-title-text">现场人员</span>
+            </div>
+            <van-row type="flex" class="card-content" justify="space-between">
+                <van-col span="7" class="card-content-labour">
+                    <p style="font-size: 16px; color: #2040FF;font-weight: bold;">200</p>
+                    <p style="font-size: 12px; color: #222E6A;">劳务人员</p>
+                </van-col>
+                <van-col span="7" class="card-content-company">
+                    <p style="font-size: 16px; color: #0098FB;font-weight: bold;">30</p>
+                    <p style="font-size: 12px; color: #222E6A;">公司人员</p>
+                </van-col>
+                <van-col span="7" class="card-content-other">
+                    <p style="font-size: 16px; color: #8B5AFF;font-weight: bold;">30</p>
+                    <p style="font-size: 12px; color: #222E6A;">其他人员</p>
+                </van-col>
+            </van-row>
+        </div>
+
+        <!--现场人员详情-->
+        <van-tabs v-model="active" class="tabs" title-active-color="#2040FF" line-width="16">
+            <van-tab title="劳务人员">
+                <van-list v-model="loading" :finished="finished" finished-text="没有更多了" @load="onLoad">
+                    <template v-for="(item,idnex) in 3">
+                        <div class="staff-card">
+                            <van-row type="flex" justify="between">
+                                <van-col>
+                                    <van-image width="60" height="100%" src="image/员工.png" />
+                                </van-col>
+                                <van-col style="flex-grow: 1;">
+                                    <div class="staff-team">
+                                        <van-row type="flex">
+                                            <van-col span="12"><span style="color: #848D99;">姓名：</span><span>张三</span>
+                                            </van-col>
+                                            <van-col><span style="color: #848D99;">电话：</span><span>13014231532</span>
+                                            </van-col>
+                                        </van-row>
+                                    </div>
+                                    <div class="staff-team">
+                                        <van-row type="flex">
+                                            <van-col span="12"><span style="color: #848D99;">班组：</span><span>开挖班组</span>
+                                            </van-col>
+                                            <van-col><span style="color: #848D99;">工种：</span><span>普工</span>
+                                            </van-col>
+                                        </van-row>
+                                    </div>
+                                    <div class="staff-team">
+                                        <span style="color: #848D99;">通过分组：</span><span>分组1</span>
+                                    </div>
+                                    <div class="staff-team">
+                                        <span style="color: #848D99;">时间：</span><span>2021-08-17 13:31</span>
+                                    </div>
+                                </van-col>
+                            </van-row>
+                        </div>
+                    </template>
+                </van-list>
+
+
+            </van-tab>
+            <van-tab title="公司人员">内容 2</van-tab>
+            <van-tab title="其他人员">内容 3</van-tab>
+        </van-tabs>
+
+
+        <!--底部弹出选项-->
+        <van-popup v-model="timeshow" position="bottom">
+            <van-datetime-picker @confirm="timeOnConfirm" v-model="timevalue" type="date" title="选择整改日期">
+            </van-datetime-picker>
+        </van-popup>
+    </div>
+</body>
+
+
+<script>
+    var date = new Date();
+    var year = date.getFullYear();
+    var month = date.getMonth() + 1;
+    var strDate = date.getDate();
+    var vm = new Vue({
+        el: "#contain",
+        data: {
+            apiUrl: 'https://site.tieweizhixing.com/',
+            searchvalue: '', //搜索内容
+            timevalue: date, //时间内容
+            timeshow: false, //显示时间选择
+            active: 0,
+            loading: false,
+            finished: false,
+            personlist:[],//人员信息
+        },
+        created() { },
+        mounted() {
+            this.getPersonlist();
+        },
+        methods: {
+            onSearch(val) {
+                this.searchvalue = val;
+            },
+            timeOnConfirm(date) {
+                this.timevalue = date
+                this.timeshow = false;
+            },
+            getPersonlist() {//获取在场人员
+                var that = this;
+                var params = {
+                    "token": "a037d5ac3688431191c7475230c28160",
+                    "sourceCode": "employee",
+                    "projectCode": "YDDSY_20211008132951486",
+                    "pageNum": 1,
+                    "pageSize": 50
+                };
+                axios.post(that.apiUrl + "/projectservice/doorInoutRecord/20/getPersonlist", params)
+                    .then(res => {
+                        if (res.data.code == '1') {
+                            that.personlist = res.data.data.list;
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                    })
+            },
+            onLoad() {
+                // 异步更新数据
+                // setTimeout 仅做示例，真实场景中一般为 ajax 请求
+                setTimeout(() => {
+                    for (let i = 0; i < 10; i++) {
+                        this.list.push(this.list.length + 1);
+                    }
+                    // 加载状态结束
+                    this.loading = false;
+
+                    // 数据全部加载完成
+                    if (this.list.length >= 40) {
+                        this.finished = true;
+                    }
+                }, 1000);
+            },
+        },
+        filters: {
+            datefmt(date) {
+                if (date) {
+                    return this.moment(date).format('YYYY/MM/DD');
+                } else {
+                    return "";
+                }
+            }
+        }
+    });
+</script>
+
+
+</html>

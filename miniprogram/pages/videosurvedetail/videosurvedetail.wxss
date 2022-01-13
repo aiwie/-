@@ -1,0 +1,225 @@
+page{
+    background-color: #F2F2F2;
+    position: fixed;
+}
+#contain {
+    margin: 5px 15px 20px;
+}
+.titleBox{
+    display: flex;
+    justify-content: space-between;
+}
+/*设备列表-Start*/
+.equipment-item {
+    position: relative;
+    margin-top: 8px;
+    padding: 26rpx 0 25rpx 22rpx;
+    background: #FFFFFF;
+    border-radius: 8rpx;
+    display: flex;
+}
+
+.equipment-item:before {
+    content: " ";
+    position: absolute;
+    top: 35%;
+    left: 0;
+    height: 180rpx;
+    border-left: 3px solid #2040FF;
+    color: #2040FF;
+    -webkit-transform-origin: 0 0;
+    transform-origin: 0 0;
+    -webkit-transform: scaleY(.5);
+    transform: scaleY(.5);
+}
+.equipmentplay-item::before{
+    content: " ";
+    position: absolute;
+    top: 35%;
+    left: 0;
+    height: 180rpx;
+    border-left: 3px solid #4CB75A;
+    color: #4CB75A;
+    -webkit-transform-origin: 0 0;
+    transform-origin: 0 0;
+    -webkit-transform: scaleY(.5);
+    transform: scaleY(.5);
+}
+.equipment-right{
+    display: flex;
+    justify-content: space-between;
+    flex: 1;
+    margin: 10rpx 20rpx;
+}
+.imgbox{
+    width: 150rpx;
+    height: 180rpx;
+}
+.textBox{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-left: 15rpx;
+}
+.text1{
+    font-size: 16px;font-weight: bold;
+}
+.text2{
+    font-size: 14px;color: #646A73;
+}
+
+
+.play {
+    position: relative;
+    line-height: 140rpx;
+}
+
+.play::before {
+    content: " ";
+    position: absolute;
+    top: 38%;
+    left: -5px;
+    width: 4px;
+    height: 4px;
+    border-radius: 20px;
+    border: 1px solid #4CB75A;
+    background-color: #4CB75A;
+}
+.videoPlay{
+    background-color: #fff;
+    border-radius: 8rpx;
+}
+.video{
+    width: 100%;
+    height: 200px;
+}
+#liveplayer{
+    width: 100%;
+    height: 100%;
+}
+.video-cao text{
+    display:inline-block;
+    width: 50%;
+    text-align: center;
+    line-height: 100rpx;
+    font-size: 12px;
+    color: #9BA6B4;
+}
+
+.scrollclass{
+    height: calc( 100vh - 100rpx - 250px );
+}
+
+.picker{
+    position: fixed;
+    bottom: -500rpx;
+    background-color: #E2E2E2;
+    width: 100%;
+    height: 500rpx;
+    transition: bottom 0.5s ease-out;
+    border-radius: 20rpx 20rpx 0 0;
+}
+.pickerActive{
+    bottom: 0rpx;
+    transition: bottom 0.5s ease-out;
+}
+.picker-top{
+    padding-left: 20rpx;
+    color: #2040FF;
+    font-size: 14px;
+    line-height: 75rpx;
+}
+.picker-content{
+    display: flex;
+    justify-content: space-around;
+    padding: 50rpx 35rpx;
+}
+.remotecontrol {
+    position: relative;
+    width: 300rpx;
+    height: 300rpx;
+    background: linear-gradient(105deg, #8867FE 0%, #6A6BF8 48%, #2040FF 86%, #2040FF 100%);
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.23);
+    border-radius: 50%;
+}
+
+.zoombutton{
+    flex-direction: column;
+    display: flex;
+    justify-content: space-evenly;
+}
+.zoombutton view{
+    width: 100rpx;
+    height: 100rpx;
+    text-align: center;
+    background: linear-gradient(180deg, #453EFE 0%, #6E6BF9 100%);
+    border-radius: 40rpx;
+}
+
+
+.remotecontrol view{
+    width: 70rpx;
+    height: 70rpx;
+    text-align: center;
+    background: linear-gradient(180deg, #453EFE 0%, #6E6BF9 100%);
+    opacity: 1;
+    border-radius: 20rpx;
+}
+.remotecontrol .remotecontrol-center{
+    position: absolute;
+    width: 150rpx;
+    height: 150rpx;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background: #E2E2E2;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.23);
+    border-radius: 50%;
+}
+
+.remotecontrol-top {
+    position: absolute;
+    top: 12%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.remotecontrol-right {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translate(-5%, -50%);
+}
+
+.remotecontrol-bottom {
+    position: absolute;
+    bottom: 0%;
+    left: 50%;
+    transform: translate(-50%, -5%);
+}
+
+.remotecontrol-left {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translate(5%, -50%);
+}
+
+#liveplayer{
+    /* position: relative; */
+}
+.full_img_idv{
+    width: 100%;
+    height: 100%;
+    
+    /* position: absolute; */
+    /* bottom: 15rpx;
+    right:20rpx; */
+    position: relative;
+}
+.full_img_idv view{
+    color: #fff;
+    position: absolute;
+    bottom: 35rpx;
+    right: 35rpx;
+}

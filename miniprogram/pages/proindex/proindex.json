@@ -1,0 +1,12 @@
+{
+
+    "navigationBarTitleText": "首页",
+    "usingComponents": {
+      "custom-navbar":"/components/custom-navbar/index",
+      "ec-canvas":"/components/ec-canvas/ec-canvas"
+    },
+    "navigationStyle": "custom"
+
+
+
+}

@@ -1,0 +1,63 @@
+<!--pages/mycompanyproject/mycompanyproject.wxml-->
+<wxs src="../../utils/filter.wxs" module="filter"></wxs>
+
+<view class="tab">
+  <view class='weui-flex'>
+    <view class='tab_item{{ statusType.currentTab == index ?" active" :"" }} weui-flex__item '
+      wx:for="{{statusType.data}}" wx:key="index" data-index='{{index}}' bindtap="swichNav">
+      <text>{{item.name}}</text>
+    </view>
+  </view>
+</view>
+<!--Tab内容布局-->
+<swiper bindchange='pagechange' current='{{statusType.currentTab}}' mode='widthFix'
+  style="height:{{windowHeight-70}}px;">
+  <!--我的公司-->
+  <swiper-item>
+    <scroll-view scroll-y="true" class="order-list" scroll-with-animation="true" style="height: {{windowHeight-70}}px;">
+      <view class="swiper-item" wx:for="{{corporationList}}" wx:key="index" wx:for-item="item" bindtap="enterTheCompanyHomepage" data-key="{{index}}">
+        <view class="company_item">
+          <view>
+            <text>{{item.corpName}}</text><text>({{item.corpFullName}})</text>
+          </view>
+          <view>
+            <text>项目授权数：{{item.allowProjectNumber}}</text>
+          </view>
+          <view>
+            <text decode="true">有&nbsp;&nbsp;&nbsp;&nbsp;效&nbsp;&nbsp;&nbsp;期：{{filter.formatTime(item.effectiveDate)}}至{{filter.formatTime(item.expireDate)}}</text>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+  </swiper-item>
+
+  <!--我的项目-->
+  <swiper-item>
+    <scroll-view scroll-y="true" class="order-list" scroll-with-animation="true" style="height: {{windowHeight-70}}px;">
+      <view class="swiper-item" wx:for="{{projectList}}" wx:key="index" wx:for-item="item" bindtap="enterTheProjectHomePage" data-key="{{index}}">
+        <view class="project-panel__hd">
+          <text class="weui-badge" style="background:#609CF9;" wx:if="{{item.projectStatus=='building'||item.projectStatus=='normal'}}">建设中</text>
+          <text class="weui-badge" style="background:#c9e703;" wx:if="{{item.projectStatus=='changeAudit'}}">变更审批中</text>
+          <text class="weui-badge" style="background:#4CB75A;" wx:if="{{item.projectStatus=='completed'}}">已完工</text>
+          <text>中铁十一局集团有限公司</text>
+        </view>
+        <view class="project-panel__bd">
+          <view class="project-cells dis-flex">
+            <view class="project-cell_hd">
+              <view class="project-cell_image">
+                <image  src="/images/mycompanyproject/{{item.projectType}}@2x.png"></image>
+              </view>
+              <text>{{filter.projectTypeDict(item.projectType)}}</text>
+            </view>
+            <view class="project-cell">
+              <view class="project_title">{{item.projectName}}</view>
+              <view class="project_content">开工日期：{{filter.formatTime(item.createDate)}}至{{filter.formatTime(item.effectiveDate)}}</view>
+              <view class="project_content">项目类型：{{filter.projectTypeDict(item.projectType)}}</view>
+              <view class="project_content">项目地址：{{item.address}}</view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+  </swiper-item>
+</swiper>

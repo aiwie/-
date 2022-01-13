@@ -1,0 +1,128 @@
+<!--pages/index/index.wxml-->
+<custom-navbar title="{{title}}" homePath="/pages/mycompanyproject/mycompanyproject">
+</custom-navbar>
+<image class="top-img" src="/images/index_top.png"></image>
+
+<!--滚动提示-->
+<view class="banner">
+    <swiper bindchange='pagechange' indicator-dots="true" circular="true" indicator-active-color="#157FC4" autoplay="true" interval="5000" style="height: 388rpx;">
+        <swiper-item class="banner_item1" style="z-index:-1">
+            <text>近15日预警数据</text>
+            <view class="banner_item1_echarts">
+                <ec-canvas id="csr_mychart" canvas-id="mychart-line" ec="{{ warning_ec }}"></ec-canvas>
+            </view>
+        </swiper-item>
+        <swiper-item class="banner_item2">
+            <view class="banner_item2_title">
+                <text>现场人员</text>
+            </view>
+            <view class="flex-x-around banner_item2_staff">
+                <view>
+                    <text style="color:#2040FF;">{{fieldForceData.inPeople}}</text>
+                    <text>劳务人员</text>
+                </view>
+                <view>
+                    <text style="color:#0098FB;">{{fieldForceData.inEmployee}}</text>
+                    <text>公司人员</text>
+                </view>
+                <view>
+                    <text style="color:#8B5AFF;">{{fieldForceData.inSelf}}</text>
+                    <text>其他人员</text>
+                </view>
+            </view>
+        </swiper-item>
+        <swiper-item class="banner_item3">
+            <view class="map_container">
+                <map class="map" id="map" longitude="{{markersData.longitude}}" latitude="{{markersData.latitude}}" scale="12" show-location="true" polygons="{{markersData.polygons}}" markers="{{markersData.markers}}" bindmarkertap="makertap">
+                </map>
+                <view class="map_details">
+                    <view class="flex-x-between">
+                        <text>开工日期：{{markersData.createDate}}</text>
+                    </view>
+                </view>
+            </view>
+            <text class="map_addres">{{markersData.address}}</text>
+        </swiper-item>
+    </swiper>
+</view>
+
+<!--功能分类-->
+<view class="category">
+    <view class="category_item" bindtap="btnIssuesM" data-index='1'>
+        <view class="category_imageBox">
+            <image class="category-image" src="/images/index/ProblemManage_icon.png" mode="aspectFill"></image>
+        </view>
+        <text>问题管理</text>
+    </view>
+    <view class="category_item" bindtap="btnIssuesM" data-index='2'>
+        <view class="category_imageBox">
+            <image class="category-image" src="/images/index/LaborReal_icon.png" mode="aspectFill"></image>
+        </view>
+        <text>劳务实名</text>
+    </view>
+    <view class="category_item" bindtap="btnIssuesM" data-index='7'>
+        <view class="category_imageBox">
+            <image class="category-image" src="/images/index/play_icon.png" mode="aspectFill"></image>
+        </view>
+        <text>进度上报</text>
+    </view>
+    <view class="category_item" bindtap="btnIssuesM" data-index='3'>
+        <view class="category_imageBox">
+            <image class="category-image" src="/images/index/ExecutionLog_icon.png" mode="aspectFill"></image>
+        </view>
+        <text>施工日志</text>
+    </view>
+    <view class="category_item" bindtap="btnIssuesM" data-index='4'>
+        <view class="category_imageBox">
+            <image class="category-image" src="../../images/index/Notice_icon.png" mode="aspectFill"></image>
+        </view>
+        <text>通知公告</text>
+    </view>
+</view>
+
+<!-- ugc-->
+<view class="ugc" bindtap="btnIssuesM" data-index='5' wx:if="{{earlyMsg.length}}">
+    <view class="ugc-icon">
+        <image src="../../images/index/icon_tixing.png" mode="aspectFill"></image>
+    </view>
+    <view class="ugc_item">
+        <view class="ugc_item_box" wx:for="(item,index) in earlyMsg" wx:key="index">
+            <text>{{item.title}}</text>
+            <text>{{item.createDate}}</text>
+        </view>
+    </view>
+    <view class="ugc-icon2">
+        <text class="iconfont icon-dianjitiaozhuan"></text>
+    </view>
+</view>
+
+<!--Tab道航-->
+<view class="tab">
+    <view class='weui-flex'>
+        <view class='tab_item{{ statusType.currentTab == index ?"-active" :"" }} weui-flex__item ' wx:for="{{statusType.data}}" wx:key="index" data-index='{{index}}' bindtap="swichNav">
+            <text>{{item.name}}</text>
+            <hr />
+        </view>
+    </view>
+    <view class="tab-content">
+        <block wx:for="{{backlogList}}" wx:key="index" wx:for-item="item">
+            <view class="tab-content_item" data-index='6' data-requestCode='{{item.requestCode}}' data-examineType='{{item.examineType}}' bindtap="detailsSkip">
+                <view class="flex-x-start">
+                    <!-- examineResult = null = 待审批
+                        examineResult = 0 = 通过 或者 拒绝
+                         examineStatus = approved/通过 reject/拒绝 -->
+                    <text wx:if="{{item.examineResult==null}}" class="weui-badge">待审批</text>
+                    <text wx:if="{{item.examineResult==1}}" class="weui-badge">审批中</text>
+                    <text wx:if="{{ item.examineResult == 0 && item.examineStatus == 'approved'}}" class="weui-badge">已通过</text>
+                    <text wx:if="{{item.examineResult == 0 && item.examineStatus == 'reject'}}" class="weui-badge">未通过</text>
+                    <text class="tab-examtype">{{item.examineType == 'quality'?'质量问题' : '安全问题'}}</text>
+                </view>
+                <view><text decode="true">[发起人]&nbsp;{{item.userName}}</text></view>
+                <view><text>发起时间：{{item.createDate}}</text></view>
+                <view><text>问题描述：{{item.describe}}</text></view>
+            </view>
+        </block>
+    </view>
+</view>
+
+<view class="tab-slot"></view>

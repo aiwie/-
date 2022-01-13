@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <!--微信-->
+  <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.3.2.js"></script>
+  <!-- Vant -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@2.12/lib/index.css" />
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6/dist/vue.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vant@2.12/lib/vant.min.js"></script>
+  <!--阿里巴巴图标-->
+  <link rel="stylesheet" href="js/iconfont/iconfont.css" />
+  <title>选择上报类目</title>
+  <style>
+    body {
+      background: #F2F2F2;
+    }
+
+    #contain {
+      margin-top: 10px;
+    }
+
+    .icon-box {
+      float: left;
+      width: 38px;
+      height: 38px;
+      margin-right: 10px;
+      text-align: center;
+      font-size: 24px;
+      color: aliceblue;
+      border-radius: 50%;
+      opacity: 1;
+    }
+
+    .van-cell {
+      line-height: 38px;
+    }
+
+
+    .van-cell__left-icon,
+    .van-cell__right-icon {
+      line-height: 38px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="contain">
+    <van-cell is-link @click="changeTo('quality')">
+      <div class="icon-box" style="background: linear-gradient(137deg, #ABE7F9 0%, #6A8AF0 100%);">
+        <i class="iconfont icon-zhiliangwentichakan"></i>
+      </div>
+      <span class="custom-title">质量问题上报</span>
+    </van-cell>
+
+    <van-cell is-link @click="changeTo('safety')">
+      <div class="icon-box" style="background: linear-gradient(134deg, #74FC86 0%, #4CB75A 100%);">
+        <i class="iconfont icon-anquanwenti"></i>
+      </div>
+      <span class="custom-title">安全问题上报</span>
+    </van-cell>
+
+    <van-cell is-link @click="changeTo('train')">
+      <div class="icon-box" style="background: linear-gradient(135deg, #EE99FC 0%, #BF26D8 100%);">
+        <i class="iconfont icon-19xianshangpeixunziliao"></i>
+      </div>
+      <span class="custom-title">班前培训上报</span>
+    </van-cell>
+
+    <!-- <van-cell is-link @click="changeTo('daily')">
+      <div class="icon-box" style="background: linear-gradient(141deg, #FFCF30 0%, #FCB436 100%);">
+        <i class="iconfont icon-rizhiguanli"></i>
+      </div>
+      <span class="custom-title">日报上传</span>
+    </van-cell> -->
+  </div>
+</body>
+
+<script src="./js/public.js"></script>
+<script>
+  window.onload = function () {
+    var isPageHide = false;
+    window.addEventListener('pageshow', function () {
+      if (isPageHide) {
+        window.location.reload()
+      }
+    })
+    window.addEventListener('pagehide', function () {
+      isPageHide = true
+    })
+  }
+  new Vue({
+    el: "#contain",
+    data: {
+      platCode: getUrlParam('platCode'),
+      corpCode: getUrlParam('corpCode'),
+      projectCode: getUrlParam('projectCode'),
+      token: getUrlParam('token'),
+      userCode: getUrlParam('userCode'),
+      userName: getUrlParam('userName'),
+      projectId: getUrlParam('projectId'),
+      mobilePhone: getUrlParam('mobilePhone'),
+    },
+    created() {
+      console.log(this.userName);
+
+      (function (win, doc) {
+        if (!win.addEventListener) return;
+        var html = document.documentElement;
+
+        function setFont() {
+          var cliWidth = html.clientWidth;
+          if (cliWidth > 750) {
+            cliWidth = 750;
+          }
+          html.style.fontSize = 100 * (cliWidth / 750) + "px";
+        }
+        win.addEventListener("resize", setFont, false);
+        doc.addEventListener("DOMContentLoaded", setFont, false);
+      })(window, document);
+    },
+    methods: {
+      changeTo(type) {
+        let severUrl = "http://127.0.0.1:5500/" // 测试数据
+        let qualityProblem = "qualityProblem.html" // 质量问题上报
+        let safetyProblem = "safetyProblem.html" // 安全问题上报
+        let BeforeTheTraining = "BeforeTheTraining.html" // 班前培训上报
+        // let logReport = "logReport.html" // 日志上报
+        switch (type) {
+          case 'quality':
+            window.location.href = qualityProblem + '?platCode=' + this.platCode + '&projectCode=' + this.projectCode + '&token=' + this.token + '&corpCode=' + this.corpCode + '&userCode=' + this.userCode + '&userName=' + this.userName + '&projectId=' + this.projectId + '&mobilePhone=' + this.mobilePhone
+            break
+          case 'safety':
+            window.location.href = safetyProblem + '?platCode=' + this.platCode + '&projectCode=' + this.projectCode + '&token=' + this.token + '&corpCode=' + this.corpCode + '&userCode=' + this.userCode + '&userName=' + this.userName + '&projectId=' + this.projectId + '&mobilePhone=' + this.mobilePhone
+            break
+          case 'train':
+            window.location.href = BeforeTheTraining + '?platCode=' + this.platCode + '&projectCode=' + this.projectCode + '&token=' + this.token + '&corpCode=' + this.corpCode + '&userCode=' + this.userCode + '&userName=' + this.userName + '&projectId=' + this.projectId + '&mobilePhone=' + this.mobilePhone
+            break
+          // case 'daily':
+          //   window.location.href = logReport + '?platCode=' + this.platCode + '&projectCode=' + this.projectCode + '&token=' + this.token + '&corpCode=' + this.corpCode + '&userCode=' + this.userCode + '&userName=' + this.userName + '&lat=' + this.porJetLat + '&lng=' + this.porJetLng
+          //   break
+        }
+      }
+    }
+  });
+</script>
+
+
+</html>

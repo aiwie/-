@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <!--微信-->
+    <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.3.2.js"></script>
+    <!-- Vant -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@2.12/lib/index.css" />
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6/dist/vue.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vant@2.12/lib/vant.min.js"></script>
+    <!--阿里巴巴图标-->
+    <link rel="stylesheet" href="js/iconfont/iconfont.css" />
+    <title>喷淋监控</title>
+    <style>
+        body {
+            background: #F2F2F2;
+        }
+
+        #contain {
+            margin: 20px 15px;
+        }
+
+        /* 喷淋监控详情-Start */
+        .spray-item {
+            position: relative;
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+
+        .spray-item em {
+            position: absolute;
+            bottom: 3px;
+            left: 10px;
+            border-width: 20px;
+            border-style: solid dashed dashed;
+            border-color: #FFF transparent transparent;
+
+            font-size: 0;
+            line-height: 0;
+        }
+
+        .spray-item:before {
+            content: " ";
+            position: absolute;
+            top: -20px;
+            bottom: -100px;
+            left: 0px;
+            border-left: 1px solid #E2E2E2;
+            color: #E2E2E2;
+            -webkit-transform-origin: 0 0;
+            transform-origin: 0 0;
+            -webkit-transform: scaleY(.5);
+            transform: scaleY(.5);
+        }
+
+        .spray-item-mark {
+            position: absolute;
+            top: 40%;
+            left: -5px;
+            width: 12px;
+            height: 12px;
+            background: #2040FF;
+            box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
+            border-radius: 50%;
+        }
+
+        .spray-item-_color {
+            margin: 3px auto;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #FFFFFF;
+        }
+
+        .spray-item-box {
+            padding: 8px 0 6px 20px;
+            background: #FFFFFF;
+            box-shadow: 0px 3px 6px rgba(94, 94, 141, 0.2);
+            border-radius: 8px;
+        }
+
+        .spray-item-box p {
+            line-height: 12px;
+        }
+
+        .spray-item-time {
+            font-size: 14px;
+            color: #9BA6B4;
+        }
+
+        .spray-item-content {
+            font-size: 14px;
+            color: #222E6A;
+        }
+
+
+        /* 喷淋监控详情-End */
+    </style>
+</head>
+
+<body>
+    <div id="contain">
+        <!--喷淋监控详情-->
+        <template v-for="(key, val) in 10">
+
+            <div class="spray-item">
+                <em></em>
+                <div class="spray-item-mark">
+                    <div class="spray-item-_color">
+                    </div>
+                </div>
+                <div class="spray-item-box">
+                    <p class="spray-item-time">2021.01.12 14:00</p>
+                    <p class="spray-item-content">PM10超标进行喷淋</p>
+                </div>
+            </div>
+
+
+        </template>
+
+    </div>
+</body>
+
+<script>
+    new Vue({
+        el: "#contain",
+        data: {
+
+        },
+        created() { },
+        methods: {
+
+        }
+    });
+</script>
+
+
+</html>

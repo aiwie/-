@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <!--微信-->
+  <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.3.2.js"></script>
+  <!-- Vant -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@2.12/lib/index.css" />
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6/dist/vue.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vant@2.12/lib/vant.min.js"></script>
+  <!--阿里巴巴图标-->
+  <link rel="stylesheet" href="js/iconfont/iconfont.css" />
+  <!--axios-->
+  <script src="https://cdn.jsdelivr.net/npm/axios@0.21.4/dist/axios.min.js"></script>
+  <!--moment时间过滤-->
+  <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.js"></script>
+  <title>施工日志管理</title>
+  <style>
+    body {
+      background: #F2F2F2;
+    }
+
+    /* 日期选择-Start*/
+    .dateselection {
+      line-height: 48px;
+      font-size: 14px;
+      color: #646A73;
+      background: #FFFFFF;
+    }
+
+    /* 日期选择-End*/
+
+
+    /* 日志列表-Start*/
+    .loglist {
+      margin-bottom: 70px;
+    }
+
+    .log-tiem {
+      margin: 12px 15px 9px 15px;
+      padding: 15px;
+      background: #FFFFFF;
+      border-radius: 8px;
+    }
+
+    .log-tiem i {
+      font-size: 16px;
+    }
+
+    .log-title {
+      position: relative;
+      margin-left: 10px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .log-title::before {
+      content: " ";
+      position: absolute;
+      top: 38%;
+      left: -10px;
+      width: 4px;
+      height: 4px;
+      border-radius: 20px;
+      border: 1px solid #4CB75A;
+      background-color: #4CB75A;
+    }
+
+    .van-divider {
+      margin: 9px 0;
+    }
+
+    .log-content {
+      font-size: 12px;
+      color: #646A73;
+    }
+
+    .log-footer {
+      margin-top: 15px;
+      font-size: 12px;
+      color: #646A73;
+    }
+
+    /* 日志列表-End*/
+
+
+    /* 日志发布-Start*/
+    .button {
+      position: fixed;
+      width: 100%;
+      height: 60px;
+      bottom: 0;
+      background: #F2F2F2;
+      border-top: 1px solid #E2E2E2;
+    }
+
+    /* 日志发布-End */
+  </style>
+</head>
+
+<body>
+  <div id="contain">
+    <!--日期选择-->
+    <van-sticky>
+      <van-sticky>
+        <van-row type="flex" justify="space-between">
+          <van-cell title="选择日期" is-link :value="timevalue|datefmt('YYYY/MM/DD')" @click="timeshow = true"></van-cell>
+          <van-popup v-model="timeshow" position="bottom">
+            <van-datetime-picker @confirm="timeOnConfirm" v-model="timevalue" type="date">
+            </van-datetime-picker>
+          </van-popup>
+        </van-row>
+      </van-sticky>
+    </van-sticky>
+
+    <!--日志列表-->
+    <div class="loglist">
+      <template v-for="(item, index) in reportData" :key="index">
+        <div class="log-tiem" @click="roblemReport('list',item.reportId)">
+          <van-row type="flex" justify="space-between">
+            <van-col>
+              <div class="log-title">
+                {{item.createDate|datefmt("YYYY年MM月DD")}} 日志记录
+              </div>
+            </van-col>
+            <van-col>
+              <i class="iconfont icon-tq_01qing"></i>
+            </van-col>
+          </van-row>
+          <van-divider></van-divider>
+          <div class="log-content">
+            <span>{{getReportDataContent(index,"name")}}</span>
+          </div>
+          <van-row type="flex" justify="end" class="log-footer">
+            <span>
+              {{item.createDate|datefmt("YYYY年MM月DD hh:mm")}}
+            </span>
+          </van-row>
+        </div>
+      </template>
+
+      <!-- <div class="log-tiem">
+                <van-row type="flex" justify="space-between">
+                    <van-col>
+                        <div class="log-title">
+                            2021年8月19 日志记录
+                        </div>
+                    </van-col>
+                    <van-col>
+                        <i class="iconfont icon-tq_03duoyun"></i>
+                    </van-col>
+                </van-row>
+                <van-divider></van-divider>
+                <div class="log-content">
+                    <span>今日施工内容：完成地下室混凝土浇筑，完成地下室混凝土浇筑，完成地下室混凝土浇筑，完成地下室混凝土浇筑，完成地下室混凝土浇筑</span>
+                </div>
+                <van-row type="flex" justify="end" class="log-footer">
+                    <span>
+                        2021年8月19 14:21
+                    </span>
+                </van-row>
+            </div>
+            <div class="log-tiem">
+                <van-row type="flex" justify="space-between">
+                    <van-col>
+                        <div class="log-title">
+                            2021年8月19 日志记录
+                        </div>
+                    </van-col>
+                    <van-col>
+                        <i class="iconfont icon-tq_11xiaoyu"></i>
+                    </van-col>
+                </van-row>
+                <van-divider></van-divider>
+                <div class="log-content">
+                    <span>今日施工内容：完成地下室混凝土浇筑，完成地下室混凝土浇筑，完成地下室混凝土浇筑，完成地下室混凝土浇筑，完成地下室混凝土浇筑</span>
+                </div>
+                <van-row type="flex" justify="end" class="log-footer">
+                    <span>
+                        2021年8月19 14:21
+                    </span>
+                </van-row>
+            </div>
+            <div class="log-tiem">
+                <van-row type="flex" justify="space-between">
+                    <van-col>
+                        <div class="log-title">
+                            2021年8月19 日志记录
+                        </div>
+                    </van-col>
+                    <van-col>
+                        <i class="iconfont icon-tq_13zhongyu"></i>
+                    </van-col>
+                </van-row>
+                <van-divider></van-divider>
+                <div class="log-content">
+                    <span>今日施工内容：完成地下室混凝土浇筑，完成地下室混凝土浇筑，完成地下室混凝土浇筑，完成地下室混凝土浇筑，完成地下室混凝土浇筑</span>
+                </div>
+                <van-row type="flex" justify="end" class="log-footer">
+                    <span>
+                        2021年8月19 14:21
+                    </span>
+                </van-row>
+            </div>
+            <div class="log-tiem">
+                <van-row type="flex" justify="space-between">
+                    <van-col>
+                        <div class="log-title">
+                            2021年8月19 日志记录
+                        </div>
+                    </van-col>
+                    <van-col>
+                        <i class="iconfont icon-tq_23leizhenyu"></i>
+                    </van-col>
+                </van-row>
+                <van-divider></van-divider>
+                <div class="log-content">
+                    <span>今日施工内容：完成地下室混凝土浇筑，完成地下室混凝土浇筑，完成地下室混凝土浇筑，完成地下室混凝土浇筑，完成地下室混凝土浇筑</span>
+                </div>
+                <van-row type="flex" justify="end" class="log-footer">
+                    <span>
+                        2021年8月19 14:21
+                    </span>
+                </van-row>
+            </div> -->
+    </div>
+
+    <!--日志发布-->
+    <div class="button">
+      <van-row type="flex" justify="space-around" style="height: 100%;align-items:center;">
+        <van-col span="22">
+          <van-button type="info" block round @click="roblemReport('issue')">上报</van-button>
+        </van-col>
+      </van-row>
+    </div>
+
+  </div>
+</body>
+
+<script src="./js/public.js"></script>
+<script>
+  var date = new Date();
+  window.onload = function () {
+    var isPageHide = false;
+    window.addEventListener('pageshow', function () {
+      if (isPageHide) {
+        window.location.reload()
+      }
+    })
+    window.addEventListener('pagehide', function () {
+      isPageHide = true
+    })
+  }
+  new Vue({
+    el: "#contain",
+    data: {
+      platCode: getUrlParam('platCode'),
+      corpCode: getUrlParam('corpCode'),
+      projectCode: getUrlParam('projectCode'),
+      token: getUrlParam('token'),
+      userCode: getUrlParam('userCode'),
+      userName: getUrlParam('userName'),
+      projectId: getUrlParam('projectId'),
+      mobilePhone: getUrlParam('mobilePhone'),
+      apiUrl: 'https://site.tieweizhixing.com',
+      timevalue: date, //筛选时间
+      timeshow: false,//显示时间选择
+      reportData: [],//日志详情
+    },
+    created() { },
+    mounted() {
+      this.getReportData();
+    },
+    methods: {
+      roblemReport(type, reportId) {
+        let severUrl = "http://127.0.0.1:5500/" // 测试数据
+        let listUrl = "logReportDetail.html" // 详情
+        let issueUrl = "logReport.html"  // 发布
+        switch (type) {
+          case 'list':
+            window.location.href = listUrl + '?platCode=' + this.platCode + '&projectCode=' + this.projectCode + '&token=' + this.token + '&corpCode=' + this.corpCode + '&userCode=' + this.userCode + this.userName + '&projectId=' + this.projectId + '&reportId=' + reportId
+            break
+          case 'issue':
+            window.location.href = issueUrl + '?platCode=' + this.platCode + '&projectCode=' + this.projectCode + '&token=' + this.token + '&corpCode=' + this.corpCode + '&userCode=' + this.userCode + '&userName=' + this.userName + '&projectId=' + this.projectId + '&mobilePhone=' + this.mobilePhone
+            break
+        }
+      },
+      timeOnConfirm(date) {
+        this.timeshow = false;
+        this.timevalue = date;
+        this.getReportData();
+      },
+      getReportData() {//获取上报数据
+        var that = this;
+        var params = {
+          platCode: that.platCode,
+          corpCode: that.corpCode,
+          projectCode: that.projectCode,
+          userCode: that.userCode,
+          reportTypeCode: "worklog",
+          reportDateStart: moment(that.timevalue).format('YYYY-MM-DD'),
+          reportDateEnd: moment(that.timevalue).format('YYYY-MM-DD')
+        };
+        axios.post(that.apiUrl + "/projectservice/report/20/getReportData", params)
+          .then(res => {
+            if (res.data.code == '1') {
+              that.reportData = res.data.data.list;
+            }
+          })
+          .catch(err => {
+            console.error(err);
+          })
+      },
+      getReportDataContent(index, contentkey) {
+        var that = this;
+        var data = that.reportData[index].content.data;
+        var object = data.filter(x => x.key === contentkey);
+        if (object.length == 1) {
+          return object[0].value;
+        }
+        else {
+          return '';
+        }
+      }
+    },
+    filters: {
+      datefmt(date, format) {
+        if (date) {
+          return this.moment(date).format(format);
+        } else {
+          return "";
+        }
+      }
+    }
+  });
+</script>
+
+
+</html>

@@ -1,0 +1,70 @@
+<view id="contain">
+        <view class="videoPlay">
+            <view class="video">
+                <live-player id="liveplayer" 
+                    autoplay="true"
+                    mode="RTC" 
+                    src="{{videoUrl}}">
+
+                    <view class="full_img_idv" >
+                          <view wx:if="{{isNotFullScreen}}" class="iconfont icon-quanping_o" bindtap="FullScreen"></view>
+                          <view wx:else class="iconfont icon-quxiaoquanping_o" bindtap="FullScreen"></view>
+                    </view>
+
+                </live-player>
+            </view>
+            <view class="video-cao">
+                <text>正在播放{{monitorName}}</text>
+                <!-- <text></text> -->
+            </view>
+        </view>
+
+         <view class="titleBox">
+            <view>
+                <h6>设备列表</h6>
+            </view>
+            <view><text style="font-size: 12px;color: #9BA6B4;">当前共计（{{total}}）个视频设备</text></view>
+        </view>
+
+        <!--设备列表-->
+        <scroll-view class="scrollclass" scroll-y="true">
+        <view wx:for="{{videoList}}" wx:for-item="item" wx:key="index">
+            <view class="equipment-item {{monitorId == item.monitorId?'equipmentplay-item': ''}}" bindtap="handlePlay" data-item="{{item}}">
+                    <view class="imgbox">
+                        <image src="../../images/sphere-camera.png" />
+                    </view>
+                    <view class="equipment-right">
+                    <view class="textBox">
+                        <text class="text1" >{{item.monitorName}}</text>
+                        <text class="text2" >{{item.areaName}}</text>
+                        <text class="text2" style="color:#4CB75A" wx:if="{{item.status == 'on'}}">设备在线</text>
+                        <text class="text2" style="color:#656565" wx:else >设备离线</text>
+                    </view>
+                    <view>
+                        <text wx:if="{{monitorId == item.monitorId}}" class="play">当前播放</text>
+                    </view>
+                    </view>
+            </view>
+        </view>
+        </scroll-view>
+
+    </view>
+
+    <!-- <view class="picker {{pickerShow ? 'pickerActive' : ''}}">
+            <view class="picker-top">
+                <text bindtap="videoCao">关闭</text>
+            </view>
+            <view class="picker-content">
+                <view class="remotecontrol">
+                    <view class="remotecontrol-center"></view>
+                    <view class="remotecontrol-top"></view>
+                    <view class="remotecontrol-right"></view>
+                    <view class="remotecontrol-bottom"></view>
+                    <view class="remotecontrol-left"></view>
+                </view>
+                <view class="zoombutton"> 
+                    <view class=""></view>
+                    <view class=""></view>
+                </view>
+            </view>
+    </view> -->

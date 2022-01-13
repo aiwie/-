@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <!--微信-->
+    <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.3.2.js"></script>
+    <!-- Vant -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@2.12/lib/index.css" />
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6/dist/vue.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vant@2.12/lib/vant.min.js"></script>
+    <!--阿里巴巴图标-->
+    <link rel="stylesheet" href="js/iconfont/iconfont.css" />
+    <!--axios-->
+    <script src="https://cdn.jsdelivr.net/npm/axios@0.21.4/dist/axios.min.js"></script>
+    <title>环境监控</title>
+    <style>
+        body {
+            background: #F2F2F2;
+        }
+
+        #contain {
+            margin: 20px 15px;
+        }
+
+        /*今日预警-Start*/
+        .todaywarning {
+            padding: 1px;
+            padding-bottom: 18px;
+            background: #FFFFFF;
+            opacity: 1;
+            border-radius: 8px;
+        }
+
+        .warning-title {
+            margin-top: 16px;
+            font-size: 16px;
+            text-align: center;
+            font-weight: bold;
+            color: #222E6A;
+        }
+
+        .warning-box {
+            margin-top: 18px;
+        }
+
+        .warning-icon {
+            margin-left: 12px;
+            margin-right: 16px;
+            width: 44px;
+            height: 44px;
+            text-align: center;
+            background: #D6DFFF;
+            border-radius: 60px;
+        }
+
+        .warning-icon i {
+            line-height: 44px;
+            font-size: 26px;
+            color: #697efc;
+        }
+
+        .warning-content-item-box {
+            width: 220px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .warning-content-item-box span {
+            line-height: 25px;
+            font-size: 12px;
+            font-weight: 400;
+            color: #222E6A;
+        }
+
+        .dianjitiaozhuan {
+            flex-grow: 1;
+            height: 44rpx;
+            text-align: center;
+        }
+
+        .dianjitiaozhuan i {
+            line-height: 44px;
+            font-size: 24px;
+            color: #222E6A;
+            opacity: 0.6;
+        }
+
+
+        /*今日预警-End*/
+
+
+        /*监控列表-Start*/
+        .monitoring-item {
+            margin-top: 12px;
+            padding: 12px;
+            background: url(/image/monitoring.png) no-repeat;
+            background-size: cover;
+            box-shadow: 0px 3px 6px rgba(112, 112, 112, 0.2);
+            border-radius: 8px;
+        }
+
+        .monitoring-site {
+            font-size: 16px;
+            font-weight: bold;
+            color: #222E6A;
+        }
+
+        .monitoring-forward {
+            font-size: 12px;
+            color: #9BA6B4;
+        }
+
+        .monitoringicon {
+            background: -webkit-linear-gradient(left bottom, #55e2fe, #428AF3);
+            background-clip: content-box;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .monitoring-name {
+            font-size: 14px;
+            color: #222E6A;
+        }
+
+        .monitoring-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #000000;
+        }
+
+        .monitoring-value.warning {
+            color: red;
+        }
+
+        .monitoring-unit {
+            font-size: 10px;
+            color: #000000;
+        }
+
+        .monitoring-unit.warning {
+            color: red;
+        }
+
+        /*监控列表-End*/
+    </style>
+</head>
+
+<body>
+    <div id="contain">
+        <!--今日预警-->
+        <div class="todaywarning">
+            <div class="warning-title">
+                <span>今日预警</span>
+            </div>
+            <!-- 预警内容 -->
+            <van-row type="flex" class="warning-box">
+                <van-col class="warning-icon">
+                    <i class="iconfont icon-tixing"></i>
+                </van-col>
+                <van-col class="warning-content-item">
+                    <div class="warning-content-item-box">
+                        <span>未佩戴安全帽预警</span>
+                        <span>30分钟前</span>
+                    </div>
+                    <div class="warning-content-item-box">
+                        <span>PM2.5气体监测异常</span>
+                        <span>30分钟前</span>
+                    </div>
+                </van-col>
+                <van-col class="dianjitiaozhuan">
+                    <i class="iconfont icon-dianjitiaozhuan"></i>
+                </van-col>
+            </van-row>
+        </div>
+
+        <!--监控列表-->
+        <!-- 
+            <div class="monitoring-item" >
+            <van-row type="flex" justify="space-between">
+                <van-col class="monitoring-site"><span>楼栋1左进口</span></van-col>
+                <van-col class="monitoring-forward"><span>查看详情 <i class="iconfont icon-dianjitiaozhuan"></i></span>
+                </van-col>
+            </van-row>
+            <van-row type="flex" justify="space-around" style="margin-top: 25px;">
+                <van-col span="7">
+                    <i class="iconfont icon-PM monitoringicon"></i>
+                    <span class="monitoring-name">PM2.5</span>
+                    <P style="line-height: 12px;">
+                        <span class="monitoring-value">251.11</span>
+                        <span class="monitoring-unit">ug/m³</span>
+                    </P>
+                </van-col>
+                <van-col span="8">
+                    <i class="iconfont icon-app_icons-- monitoringicon"></i>
+                    <span class="monitoring-name">PM10</span>
+                    <P style="line-height: 12px;">
+                        <span class="monitoring-value">545.12</span>
+                        <span class="monitoring-unit">ug/m³</span>
+                    </P>
+                </van-col>
+                <van-col>
+                    <i class="iconfont icon-zaoyin monitoringicon"></i>
+                    <span class="monitoring-name">噪音</span>
+                    <P style="line-height: 12px;">
+                        <span class="monitoring-value warning">36.6</span>
+                        <span class="monitoring-unit warning">dB</span>
+                    </P>
+                </van-col>
+            </van-row>
+
+            <van-row type="flex" justify="space-around" style="margin-top: 25px;">
+                <van-col span="7">
+                    <i class="iconfont icon-fengsu monitoringicon"></i>
+                    <span class="monitoring-name">风速</span>
+                    <P style="line-height: 12px;">
+                        <span class="monitoring-value">5</span>
+                        <span class="monitoring-unit">m/s</span>
+                    </P>
+                </van-col>
+                <van-col span="8">
+                    <i class="iconfont icon-wendu monitoringicon"></i>
+                    <span class="monitoring-name">温度</span>
+                    <P style="line-height: 12px;">
+                        <span class="monitoring-value">25</span>
+                        <span class="monitoring-unit">℃</span>
+                    </P>
+                </van-col>
+                <van-col>
+                    <i class="iconfont icon-icontubiao monitoringicon"></i>
+                    <span class="monitoring-name">湿度</span>
+                    <P style="line-height: 12px;">
+                        <span class="monitoring-value">75</span>
+                        <span class="monitoring-unit">%</span>
+                    </P>
+                </van-col>
+            </van-row>
+        </div>
+        <div class="monitoring-item">
+            <van-row type="flex" justify="space-between">
+                <van-col class="monitoring-site"><span>楼栋1左出口</span></van-col>
+                <van-col class="monitoring-forward"><span>查看详情 <i class="iconfont icon-dianjitiaozhuan"></i></span>
+                </van-col>
+            </van-row>
+            <van-row type="flex" justify="space-around" style="margin-top: 25px;">
+                <van-col span="7">
+                    <i class="iconfont icon-PM monitoringicon"></i>
+                    <span class="monitoring-name">PM2.5</span>
+                    <P style="line-height: 12px;">
+                        <span class="monitoring-value">251.11</span>
+                        <span class="monitoring-unit">ug/m³</span>
+                    </P>
+                </van-col>
+                <van-col span="8">
+                    <i class="iconfont icon-app_icons-- monitoringicon"></i>
+                    <span class="monitoring-name">PM10</span>
+                    <P style="line-height: 12px;">
+                        <span class="monitoring-value">545.12</span>
+                        <span class="monitoring-unit">ug/m³</span>
+                    </P>
+                </van-col>
+                <van-col>
+                    <i class="iconfont icon-zaoyin monitoringicon"></i>
+                    <span class="monitoring-name">噪音</span>
+                    <P style="line-height: 12px;">
+                        <span class="monitoring-value warning">36.6</span>
+                        <span class="monitoring-unit warning">dB</span>
+                    </P>
+                </van-col>
+            </van-row>
+
+            <van-row type="flex" justify="space-around" style="margin-top: 25px;">
+                <van-col span="7">
+                    <i class="iconfont icon-fengsu monitoringicon"></i>
+                    <span class="monitoring-name">风速</span>
+                    <P style="line-height: 12px;">
+                        <span class="monitoring-value">5</span>
+                        <span class="monitoring-unit">m/s</span>
+                    </P>
+                </van-col>
+                <van-col span="8">
+                    <i class="iconfont icon-wendu monitoringicon"></i>
+                    <span class="monitoring-name">温度</span>
+                    <P style="line-height: 12px;">
+                        <span class="monitoring-value">25</span>
+                        <span class="monitoring-unit">℃</span>
+                    </P>
+                </van-col>
+                <van-col>
+                    <i class="iconfont icon-icontubiao monitoringicon"></i>
+                    <span class="monitoring-name">湿度</span>
+                    <P style="line-height: 12px;">
+                        <span class="monitoring-value">75</span>
+                        <span class="monitoring-unit">%</span>
+                    </P>
+                </van-col>
+            </van-row>
+        </div> 
+    -->
+
+        <template v-for="(item, index) in LastDataOfProject" :key="index">
+            <div class="monitoring-item">
+                <van-row type="flex" justify="space-between">
+                    <van-col class="monitoring-site"><span>{{item.faciName}}</span></van-col>
+                    <van-col class="monitoring-forward"><span @click='handleDetail(item.faciCode)'>查看详情 <i class="iconfont icon-dianjitiaozhuan"></i></span>
+                    </van-col>
+                </van-row>
+                <van-row type="flex" justify="space-around" style="margin-top: 25px;">
+                    <van-col span="7">
+                        <i class="iconfont icon-PM monitoringicon"></i>
+                        <span class="monitoring-name">{{item.datas[0].paraName|paradict}}</span>
+                        <P style="line-height: 12px;">
+                            <span class="monitoring-value">{{item.datas[0].paraValue}}</span>
+                            <span class="monitoring-unit">ug/m³</span>
+                        </P>
+                    </van-col>
+                    <van-col span="8">
+                        <i class="iconfont icon-app_icons-- monitoringicon"></i>
+                        <span class="monitoring-name">{{item.datas[1].paraName|paradict}}</span>
+                        <P style="line-height: 12px;">
+                            <span class="monitoring-value">{{item.datas[1].paraValue}}</span>
+                            <span class="monitoring-unit">ug/m³</span>
+                        </P>
+                    </van-col>
+                    <van-col>
+                        <i class="iconfont icon-zaoyin monitoringicon"></i>
+                        <span class="monitoring-name">{{item.datas[2].paraName|paradict}}</span>
+                        <P style="line-height: 12px;">
+                            <span class="monitoring-value warning">{{item.datas[2].paraValue}}</span>
+                            <span class="monitoring-unit warning">dB</span>
+                        </P>
+                    </van-col>
+                </van-row>
+
+                <van-row type="flex" justify="space-around" style="margin-top: 25px;">
+                    <van-col span="7">
+                        <i class="iconfont icon-fengsu monitoringicon"></i>
+                        <span class="monitoring-name">{{item.datas[3].paraName|paradict}}</span>
+                        <P style="line-height: 12px;">
+                            <span class="monitoring-value">{{item.datas[3].paraValue}}</span>
+                            <span class="monitoring-unit">m/s</span>
+                        </P>
+                    </van-col>
+                    <van-col span="8">
+                        <i class="iconfont icon-wendu monitoringicon"></i>
+                        <span class="monitoring-name">{{item.datas[4].paraName|paradict}}</span>
+                        <P style="line-height: 12px;">
+                            <span class="monitoring-value">{{item.datas[4].paraValue}}</span>
+                            <span class="monitoring-unit">℃</span>
+                        </P>
+                    </van-col>
+                    <van-col>
+                        <i class="iconfont icon-icontubiao monitoringicon"></i>
+                        <span class="monitoring-name">{{item.datas[5].paraName|paradict}}</span>
+                        <P style="line-height: 12px;">
+                            <span class="monitoring-value">{{item.datas[5].paraValue}}</span>
+                            <span class="monitoring-unit">%</span>
+                        </P>
+                    </van-col>
+                </van-row>
+
+            </div>
+        </template>
+    </div>
+</body>
+
+<script>
+    new Vue({
+        el: "#contain",
+        data: {
+            apiUrl: 'https://site.tieweizhixing.com',
+            LastDataOfProject: [],//项目数据
+            platCode:'',
+            projectCode:"",
+            token:''
+        },
+        created() { },
+        mounted() {
+            this.platCode = this.getQueryString('platCode')
+            this.projectCode = this.getQueryString('projectCode')
+            this.token = this.getQueryString('token')
+            this.getLastDataOfProjectByCate();
+        },
+        methods: {
+            getLastDataOfProjectByCate() {
+                var that = this;
+                var params = {
+                    // platCode: "ibuildSite",
+                    platCode: this.platCode,
+                    // projectCode: "XCXXM2Q_20211029111231765",
+                    projectCode: this.projectCode,
+                    faciCategory: "envi",
+                    pageSize: 1000,
+                    pageNum: 1
+                };
+                axios.post(that.apiUrl + "/iotservice/dvData/20/getLastDataOfProjectByCate", params)
+                    .then(res => {
+                        if (res.data.code == '1') {
+                            that.LastDataOfProject = res.data.data.list;
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                    })
+            },
+            handleDetail(val){
+                 window.location.href = this.apiUrl + '/file-service/files/h5/circumstancesDetail.html?token='+this.token+'&faciCode='+val
+                // window.location.href = 'http://127.0.0.1:5500/circumstancesDetail.html?token='+this.token+'&faciCode='+val
+            },
+            getQueryString(name) {
+                var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+                var r = window.location.search.substr(1).match(reg);
+                if (r != null) return unescape(r[2]); return null;
+            }
+        },
+        filters: {
+            paradict(key) {
+                var dict = {
+                    windspeed: "风速",windscale: "风力",winddirection: "风向", winddirectionbig: "风向角度", humidityvalue: "湿度", 
+                    temperaturevalue: "温度",noisevalue: "噪声", pm25: "pm2.5", pm10: "pm10", tspvalue: "tsp", pressurevalue: "大气压",
+                    luxvalue: "lwx"
+                };
+                return dict[key]
+
+            }
+        }
+    });
+</script>
+
+</html>

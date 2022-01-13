@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <!--jquery-->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <!--微信-->
+    <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.3.2.js"></script>
+    <!-- Vant -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@2.12/lib/index.css" />
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6/dist/vue.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vant@2.12/lib/vant.min.js"></script>
+    <!--阿里巴巴图标-->
+    <link rel="stylesheet" href="js/iconfont/iconfont.css" />
+    <!--axios-->
+    <script src="https://cdn.jsdelivr.net/npm/axios@0.21.4/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.js"></script>
+    <script src="https://cdn.jsdelivr.net/hls.js/latest/hls.min.js"></script>
+    <title>视频监控详情</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #F2F2F2;
+        }
+
+        #contain {
+            margin: 20px 15px;
+        }
+
+        /*摄像头画面-Start*/
+        .video {
+            background: #FFFFFF;
+            border-radius: 4px;
+            box-shadow: 0px 3px 6px rgba(112, 112, 112, 0.2);
+        }
+
+        .video-picture {
+            height: 200px;
+        }
+
+        .video-btn {
+            text-align: center;
+            line-height: 50px;
+            font-size: 12px;
+            color: #9BA6B4;
+        }
+
+        .video-btn i {
+            margin-right: 5px;
+            font-size: 24px;
+        }
+
+        /*摄像头画面-End*/
+
+
+        /*设备列表-Start*/
+        .equipment-item {
+            position: relative;
+            margin-top: 8px;
+            padding: 26px 12px 25px 22px;
+            background: #FFFFFF;
+            border-radius: 8px;
+        }
+
+        .equipment-item:before {
+            content: " ";
+            position: absolute;
+            top: 35%;
+            left: 0;
+            height: 60px;
+            border-radius: 8px;
+            border-left: 4px solid #2040FF;
+            color: #2040FF;
+            -webkit-transform-origin: 0 0;
+            transform-origin: 0 0;
+            -webkit-transform: scaleY(.5);
+            transform: scaleY(.5);
+        }
+
+        .equipment-item-play {
+            position: relative;
+            margin-top: 8px;
+            padding: 26px 12px 25px 22px;
+            background: #FFFFFF;
+            border-radius: 8px;
+        }
+
+        .equipment-item-play:before {
+            content: " ";
+            position: absolute;
+            top: 35%;
+            left: 0;
+            height: 60px;
+            border-radius: 8px;
+            border-left: 4px solid #4CB75A;
+            color: #4CB75A;
+            -webkit-transform-origin: 0 0;
+            transform-origin: 0 0;
+            -webkit-transform: scaleY(.5);
+            transform: scaleY(.5);
+        }
+
+        .play {
+            position: relative;
+        }
+
+        .play::before {
+            content: " ";
+            position: absolute;
+            top: 38%;
+            right: 50px;
+            width: 4px;
+            height: 4px;
+            border-radius: 20px;
+            border: 1px solid #4CB75A;
+            background-color: #4CB75A;
+        }
+
+        /*设备列表-End*/
+
+
+        /*设备控制-Start*/
+        .van-popup {
+            background-color: #E2E2E2;
+        }
+
+        .van-picker__toolbar {
+            background-color: #FFFFFF;
+            height: 10%;
+        }
+
+        .van-picker__cancel {
+            font-size: 14px;
+            color: #2040FF;
+        }
+
+        .van-picker_content {
+            padding-top: 10%;
+            padding-left: 8%;
+        }
+
+        .remotecontrol {
+            position: relative;
+            width: 10rem;
+            height: 10rem;
+            background: linear-gradient(105deg, #8867FE 0%, #6A6BF8 48%, #2040FF 86%, #2040FF 100%);
+            box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.23);
+            border-radius: 50%;
+        }
+
+        .remotecontrol div:not(:nth-child(1)) {
+            width: 28px;
+            height: 28px;
+            text-align: center;
+            background: linear-gradient(180deg, #453EFE 0%, #6E6BF9 100%);
+            opacity: 1;
+            border-radius: 10px;
+        }
+
+        .remotecontrol-center {
+            position: absolute;
+            width: 5rem;
+            height: 5rem;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background: #E2E2E2;
+            box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.23);
+            border-radius: 50%;
+        }
+
+        .remotecontrol-top {
+            position: absolute;
+            top: 12%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .remotecontrol-right {
+            position: absolute;
+            top: 50%;
+            right: 0;
+            transform: translate(-25%, -50%);
+        }
+
+        .remotecontrol-bottom {
+            position: absolute;
+            bottom: 0%;
+            left: 50%;
+            transform: translate(-50%, -25%);
+        }
+
+        .remotecontrol-left {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translate(25%, -50%);
+        }
+
+        .remotecontrol i {
+            line-height: 28px;
+            font-size: 20px;
+            color: #FFFFFF;
+        }
+
+
+
+        .zoombutton {
+            margin-left: 50px;
+        }
+
+        .zoombutton div {
+            width: 38px;
+            height: 38px;
+            text-align: center;
+            background: linear-gradient(180deg, #453EFE 0%, #6E6BF9 100%);
+            border-radius: 10px;
+        }
+
+        .zoombutton .van-icon {
+            line-height: 38px;
+            font-size: 24px;
+            color: #FFFFFF;
+        }
+
+        .greenClore {
+            color: #4CB75A;
+        }
+       
+        /*设备控制-End*/
+    </style>
+</head>
+
+<body>
+    <div id="contain">
+        <!--摄像头画面-->
+        <van-sticky>
+            <div class="video">
+                <div class="video-picture">
+                  
+                    <video class="iframeclass" id="videoid" controls width="100%"
+                        height="100%"></video>
+                </div>
+                <van-row type="flex" justify="space-between" class="video-btn">
+                    <van-col span="12"><i class="iconfont icon-jietu"></i>截图</van-col>
+                    <van-col span="12" @click="show = true"><i class="iconfont icon-shipinkongzhi"></i>视频控制</van-col>
+                </van-row>
+            </div>
+        </van-sticky>
+
+        <!--设备列表-->
+        <template v-for="(item,index) in list">
+            <div @click='handelVideo(item)'>
+                <div :class="['equipment-item', item.monitorId == monitorId ? 'equipment-item-play':'']">
+                    <van-row type="flex">
+                        <van-col span="6">
+                            <van-image width="50" height="60" src="image/sphere-camera.png" />
+                        </van-col>
+                        <van-col style="line-height: 28px;flex-grow: 1; ">
+                            <van-row type="flex" justify="space-between">
+                                <van-col span="12" :class="[item.monitorId == monitorId ? 'greenClore':'']">
+                                    {{item.monitorName}}
+                                </van-col>
+                                <van-col class="play" span="12" v-show='item.monitorId == monitorId '
+                                    style="font-size: 12px; text-align: right;color: #4CB75A;">当前播放
+                                </van-col>
+                            </van-row>
+                            <p style="font-size: 14px;color: #646A73;">
+                                {{item.areaName}}
+                            </p>
+                        </van-col>
+                    </van-row>
+                </div>
+            </div>
+        </template>
+
+        <!--设备控制-->
+        <van-popup v-model="show" round position="bottom" :style="{ height: '45%' }" :overlay="false">
+            <div class="van-picker__toolbar">
+                <button type="button" class="van-picker__cancel" @click="show = false">关闭</button>
+            </div>
+            <div class="van-picker_content">
+                <van-row type="flex">
+                    <van-col>
+                        <div class="remotecontrol">
+                            <div class="remotecontrol-center"></div>
+                            <div class="remotecontrol-top" @click='handleFC("0")'>
+                                <i class="iconfont icon-shangsanjiaoxing"></i>
+                            </div>
+                            <div class="remotecontrol-right" @click='handleFC("3")'>
+                                <i class="iconfont icon-sanjiaoxing-xia1"></i>
+                            </div>
+                            <div class="remotecontrol-bottom" @click='handleFC("1")'>
+                                <i class="iconfont icon-xiasanjiaoxing"></i>
+                            </div>
+                            <div class="remotecontrol-left" @click='handleFC("2")'>
+                                <i class="iconfont icon-xiangzuo"></i>
+                            </div>
+                        </div>
+                    </van-col>
+                    <van-col class="zoombutton">
+                        <div @click='handleFC("8")'>
+                            <van-icon name="plus"></van-icon>
+                        </div>
+                        <div style="margin-top: 5rem;" @click='handleFC("9")'>
+                            <van-icon name="minus"></van-icon>
+                        </div>
+                    </van-col>
+                </van-row>
+            </div>
+        </van-popup>
+
+    </div>
+</body>
+
+
+<script>
+    var vm = new Vue({
+        el: "#contain",
+        data: {
+            apiUrl: 'https://site.tieweizhixing.com/',
+            show: true,
+            platCode: '',
+            projectCode: "",
+            monitorId: '',
+            list: [],
+            mediaDescribe: '',
+            mediaUrl: '',
+            deviceSerial: '',
+            channel: '',
+            videoList:[],
+            interVal:null,
+        },
+        created() {
+            this.platCode = this.getQueryString('platCode')
+            this.projectCode = this.getQueryString('projectCode')
+            this.monitorId = this.getQueryString('monitorId')
+            this.getSelectMonitorList()
+        },
+        beforeDestroy() {
+            this.closeVideo()
+        },
+        mounted() { },
+        methods: {
+            getSelectMonitorList() {
+                var that = this;
+                var params = {
+                    platCode: this.platCode,
+                    // platCode: 'ibuildSite',
+                    projectCode: this.projectCode,
+                    // projectCode: 'GGDLCJZX_20211019102801798',
+                };
+                axios.post(that.apiUrl + "projectservice/monitor/20/selectMonitorList", params)
+                    .then(res => {
+                        if (res.data.code == '1') {
+                            let videoList = res.data.data.list
+                            // let videoList = [
+                                
+                            //     {
+                            //         "monitorId": 16,
+                            //         "projectCode": "ANQXSZ_20210916150714549",
+                            //         "mediaUrl": "https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/F74954671/3.hd.live&autoplay=1&accessToken=at.90t6cx8k3mmyt1sr2dyq2o6x9z4xv9qy-7efkzoh70p-103hbki-o7lmwwejy",
+                            //         "monitorName": "监控1",
+                            //         "faciCode": "F7495467103-01",
+                            //         "serialNumber": 3,
+                            //         "channel": "3",
+                            //         "channelName": "频道3",
+                            //         "showType": "monitor",
+                            //         "mediaDescribe": "hkvision",
+                            //         "gps": "39.916217,116.410598",
+                            //         "areaName": "分组一",
+                            //         "deviceSerial": "F74954671",
+                            //         "status": "0",
+                            //         "providerId": "c708deb8f52a40559116ed2647133b3f",
+                            //         "providerName": "海康威视",
+                            //         "faciTypeName": "海康视频监控",
+                            //         "faciRemark": "监控1",
+                            //         "faciGroupId": "75",
+                            //         "createDate": "2021-11-02 15:37:00",
+                            //         "mediaStreamUrl":"http://hls01open.ys7.com/openlive/42fc540eb8954f55b6c4172684b84f7c.m3u8"
+                            //     },
+                            //     {
+                            //         "monitorId": 17,
+                            //         "projectCode": "ANQXSZ_20210916150714549",
+                            //         "mediaUrl": "F74954671/3.hd.live&autoplay=1&accessToken=at.90t6cx8k3mmyt1sr2dyq2o6x9z4xv9qy-7efkzoh70p-103hbki-o7lmwwejy",
+                            //         "monitorName": "大门监控",
+                            //         "faciCode": "123",
+                            //         "serialNumber": 3,
+                            //         "channel": "3",
+                            //         "channelName": "频道3",
+                            //         "showType": "monitor",
+                            //         "mediaDescribe": "FFEF1231242",
+                            //         "gps": "39.918129,116.414761",
+                            //         "areaName": "设备",
+                            //         "deviceSerial": "F74954671",
+                            //         "status": "0",
+                            //         "providerId": "68d9d2f09d8346a0a476ef4e5363eb7c",
+                            //         "providerName": "测试接入商1-fuhao",
+                            //         "faciTypeName": "测试数据-fuhao",
+                            //         "faciRemark": "大门监控",
+                            //         "faciGroupId": "0",
+                            //         "createDate": "2021-11-02 15:37:00",
+                            //         "mediaStreamUrl":"http://hls01open.ys7.com/openlive/42fc540eb8954f55b6c4172684b84f7c.hd.m3u8"
+                            //     },
+                            // ]
+                            this.list = videoList
+                            this.list.forEach(el => {
+                                if (el.monitorId == this.monitorId) {
+                                    this.mediaDescribe = el.mediaDescribe
+                                    this.mediaUrl = el.mediaStreamUrl
+                                    this.deviceSerial = el.deviceSerial
+                                    this.channel = el.channel
+                                }
+                            });
+                            this.hlsFn()
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                    })
+            },
+            handelVideo(val) {
+                this.monitorId = val.monitorId
+                this.mediaDescribe = val.mediaDescribe
+                this.mediaUrl = val.mediaStreamUrl
+                this.deviceSerial = val.deviceSerial
+                this.channel = val.channel
+                this.hlsFn()
+            },
+            // 操作云盘
+            handleFC(n){
+                if(this.interVal){
+                    clearInterval(this.interVal)
+                }
+                let that = this
+                let params = {
+                    deviceSerial:this.deviceSerial,
+                    direction:n,
+                    speed:'1',
+                    operation:'start',
+                    channel:this.channel
+                }
+               this.fcOperationCamera(params)
+               this.interVal = setTimeout(function(){
+                    params.operation = 'stop'
+                    that.fcOperationCamera(params)
+               },1000)
+            },
+            fcOperationCamera(params){
+                axios.post(this.apiUrl + "iotservice/camera/20/operationCamera", params)
+                    .then(res => {
+                        if (res.data.code == '1') {
+                           
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                })
+            },
+            hlsFn() {
+                this.$nextTick(() => {
+                  
+                            if (Hls.isSupported()) {
+                                let video = document.getElementById('videoid')
+                                let hls = new Hls()
+                                hls.loadSource(this.mediaUrl)
+                                hls.attachMedia(video)
+                                hls.on(Hls.Events.MANIFEST_PARSED, function () {
+                                    video.play()
+                                })
+                                this.videoList.push({ video, hls })
+                            }
+                        
+                    
+                })
+            },
+            getQueryString(name) {
+                var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+                var r = window.location.search.substr(1).match(reg);
+                if (r != null) return unescape(r[2]); return null;
+            },
+            closeVideo() {
+            if (this.videoList.length > 0) {
+                this.videoList.forEach((item) => {
+                item.video.pause()
+                item.hls.destroy()
+                item.hls = null
+                })
+            }
+            }
+        }
+
+    });
+</script>
+
+
+</html>

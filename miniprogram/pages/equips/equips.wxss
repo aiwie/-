@@ -1,0 +1,78 @@
+/* pages/customer/equips.wxss */
+@import "/dist/css/general.wxss";
+
+ec-canvas {
+    width: 100%;
+    height: 100%;
+}
+
+/*统计图*/
+.chartcontent {
+    margin-top: 50rpx;
+    padding: 24rpx;
+}
+
+.chartcontent-title {
+    text-align: center;
+    font-size: var(--textfont);
+    font-weight: 400;
+    color: rgba(0, 0, 0, 0.9);
+    opacity: 1;
+}
+
+.chartcontent-content {
+    margin-top: 10rpx;
+    height: 274rpx;
+    background: #FFFFFF;
+    box-shadow: 0px 3px 6px rgba(20, 133, 238, 0.1);
+    opacity: 1;
+    border-radius: 2px;
+}
+
+
+/*设备*/
+.footer {
+    padding: 24rpx;
+}
+
+.customer {
+    background: #FFFFFF;
+    padding: 20rpx;
+}
+
+.customer-title {
+    font-size: var(--bodyfont);
+    font-weight: bold;
+    color: #292929;
+    opacity: 1;
+}
+
+/*搜索框*/
+.weui-search-bar {
+    margin-top: 20rpx;
+    padding: 2rpx;
+}
+
+
+/*设备列表*/
+.device-list {
+    margin-top: 5px;
+    border-bottom: 1px solid rgba(229, 229, 229, .5);
+    padding-bottom: 20rpx;
+}
+
+.device-name {
+    font-size: var(--textfont);
+    font-weight: bold;
+}
+
+.device-count {
+    font-size: var(--bodyfont);
+    font-weight: bold;
+    color: #1485EE;
+}
+
+.device-chart {
+    height: 274rpx;
+    width: 100%;
+}

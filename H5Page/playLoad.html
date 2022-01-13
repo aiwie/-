@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <!--微信-->
+    <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.3.2.js"></script>
+    <!-- Vant -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@2.12/lib/index.css" />
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6/dist/vue.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vant@2.12/lib/vant.min.js"></script>
+    <!--阿里巴巴图标-->
+    <link rel="stylesheet" href="js/iconfont/iconfont.css" />
+    <!--axios-->
+    <script src="https://cdn.jsdelivr.net/npm/axios@0.21.4/dist/axios.min.js"></script>
+    <!--moment时间过滤-->
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.js"></script>
+
+    <link rel="stylesheet" href="./css/elementui.css">
+    <!-- 引入组件库 -->
+    <script src="./js/elementui.js"></script>
+
+
+    <title>计划进度</title>
+    <style>
+        body {
+            background: #fff;
+        }
+
+        #contain {
+            /* margin: 0 15px; */
+        }
+
+        .form {
+            margin: 15px;
+            margin-bottom: 0px;
+        }
+
+        .van-cell {
+            margin-top: 8px;
+            background: #F1F3F5;
+            border-radius: 8px;
+        }
+
+        .titP {
+            margin-bottom: 10px;
+            border-left: 4px solid #2040FF;
+            padding-left: 10px;
+        }
+        .stepper span{
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            text-align: center;
+            font-size: 14px;
+            vertical-align: middle;
+        }
+        .stepper .btn{
+            color: #222E6A;
+            background: #E2E2E2;
+        }
+        .footel-progre{
+            width: 60%;
+            display: inline-block;
+        }
+        .footel-progre .el-progress-bar{
+            padding-right: 0px;
+        }
+        .footel-progre .el-progress__text{
+            display: none;
+        }
+        .footel-step p{
+            margin: 5px auto;
+        }
+        .footel-cell{
+            margin-top: 0px;
+            margin-bottom: 61px;
+        }
+        .button {
+            z-index: 100;
+            position: fixed;
+            width: 100%;
+            height: 60px;
+            bottom: 0;
+            background: #fff;
+            border-top: 1px solid #E2E2E2;
+        }
+        input[type=range]{
+            -webkit-appearance: none;
+            width: 100%;
+            height: 10px;
+            border-radius: 10px;
+            background: transparent;
+            /* background: -webkit-linear-gradient(#059CFA, #059CFA) no-repeat; */
+            /* background-size: 0% 100%; */
+           position: absolute;
+           z-index: 10;
+        }
+        .inrange::-webkit-slider-thumb{
+             -webkit-appearance: none;
+             background: #6A8AF0;
+             width: 15px;
+             height: 15px;
+             border-radius: 50%;
+             border: 2px solid #fff;
+             box-sizing: content-box;
+       
+        }
+        .inrange::-webkit-slider-runnable-track{
+            /* background: #6A8AF0; */
+        }
+        .afterdiv{
+            content: "";
+            height: 10px;
+            background: #6A8AF0;
+            display: inline-block;
+            position: absolute;
+            z-index: 5;
+            border-radius: 5px 0 0 5px;
+        }
+        .rangeBox{
+            width: 100%;
+            height: 10px;
+            position: relative;
+            background: #E2E2E2;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="contain">
+        <van-form class="form">
+            <h4 class="titP">进度详情</h4>
+            <van-cell title="计划名称" :value="workList.planName"></van-cell>
+            <van-cell title="计划开始时间" :value="workList.createDate"></van-cell>
+            <van-cell title="计划结束时间" :value="workList.endDate"></van-cell>
+            <van-cell title="工期" >{{workList.duration}}天</van-cell>
+            <van-cell title="当前进度">{{workList.percent}}%</van-cell>
+
+            <h4 class="titP">本次上报</h4>
+            <template v-if="islevel == 'true' ">
+                <van-cell title="上报进度" is-link :value="nowPercent? nowPercent :'请选择当前进度'" @click="ispercent = true"></van-cell>
+                <van-popup v-model="ispercent" position="bottom">
+                    <van-picker show-toolbar :columns="teamcolumns" value-key='text' @confirm="teamOnConfirm"
+                        @cancel="ispercent = false" />
+                </van-popup>
+            </template>
+            <template v-else>
+                <van-cell title="上报进度">
+                   <div class="stepper">
+                       <span class="btn" @click="mydelete">-</span>
+                       <span class="btn">{{nowPercentValue}}</span>
+                       <span class="btn" @click="myadd">+</span>
+                       <span>%</span>
+                   </div> 
+                </van-cell>
+
+                <div class="rangeBox">
+                    <input class="inrange" type="range" min="0" max="100" :value='nowPercentValue' v-model="nowPercentValue">
+                    <div class="afterdiv" :style="widthChange"></div>
+                </div>
+                
+
+
+            </template>
+
+            <h4 class="titP" v-show='recordList.length > 0'>上报记录</h4>
+        </van-form>
+        <van-cell class="footel-cell" v-show='recordList.length > 0'>
+            <van-steps direction="vertical" active="null">
+                <van-step v-for="(item,index) in recordList" :key="index" class="footel-step">
+                  <p>{{item.createDate}}</p>
+                  <p><el-progress :percentage="item.percent" class="footel-progre"></el-progress> 进度{{item.percent}}%</p>
+                  <p>上报人：{{item.userName}}</p>
+                </van-step>
+              </van-steps>
+        </van-cell>
+
+        
+            <div class="button" >
+                <van-row type="flex" justify="space-around" style="height: 100%;align-items:center;">
+                  <van-col span="11">
+                    <van-button type="info" block round color="#C5C8D2" @click="goBackUrl">取消</van-button>
+                  </van-col>
+                  <van-col span="11">
+                    <van-button type="info" block round color="#6A8AF0" v-on:click="submitForm">提交</van-button>
+                  </van-col>
+                </van-row>
+              </div>
+        
+
+
+    </div>
+</body>
+
+<script src="./js/public.js"></script>
+
+<script>
+    new Vue({
+        el: "#contain",
+       
+        data: {
+            projectCode: getUrlParam('projectCode'),
+            token: getUrlParam('token'),
+            projectName: getUrlParam('projectName'),
+            id: getUrlParam('id'),
+            islevel: getUrlParam('islevel'),
+            corpCode: getUrlParam('corpCode'),
+              apiUrl: 'https://site.tieweizhixing.com/',
+            // apiUrl: 'http://121.36.223.253:7000/',
+            workList: {},
+            recordList: [],
+            nowPercent: '', //进度上报label
+            nowPercentValue: '0', //进度上报value
+            ispercent: false, //进度上报选项框显示隐藏
+            teamcolumns: [
+                {
+                    text: '0%(子计划全部未开始)',
+                    num: '0'
+                },
+                {
+                    text: '100%(子计划全部完成)',
+                    num: '100'
+                }
+            ],
+        },
+        created() {
+            document.title = this.projectName
+            this.workPlanDetail()
+        },
+        computed:{
+            widthChange:function(){
+                let bili = this.nowPercentValue
+                let dom = `width:${bili}%`
+                return dom
+            }
+        },
+        mounted() {
+
+        },
+        methods: {
+            workPlanDetail() {
+                var that = this;
+                var params = {
+                      token: that.token,
+                    // 'token': '6a81bd8c9c474a2f91ae9af112a26518',
+                      projectCode: that.projectCode,
+                    // 'projectCode': 'PXDDMZJGS_20211111102202789',
+                    id: this.id
+                };
+                axios.post(that.apiUrl + "projectservice/plan/20/workPlanDetail", params)
+                    .then(res => {
+                        if (res.data.code == '1') {
+                            that.workList = res.data.data.workPlanDetail || {}
+                            that.workList.createDate = that.timeFn(that.workList.createDate)
+                            that.workList.endDate = that.timeFn(that.workList.endDate)
+                            that.recordList = res.data.data.recordList || {}
+                            this.nowPercentValue = that.workList.percent
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                    })
+            },
+            teamOnConfirm(data) {
+                this.ispercent = false
+                this.nowPercentValue = data.num
+                this.nowPercent = data.text
+            },
+            mydelete(){
+                this.nowPercentValue--
+                if(this.nowPercentValue <= 0){
+                    this.nowPercentValue = 0
+                }
+            },
+            myadd(){
+                this.nowPercentValue++
+                if(this.nowPercentValue >= 100){
+                    this.nowPercentValue = 100
+                }
+            },
+            goBackUrl(){
+                window.history.back(-1)
+                // window.location.href = 'playList.html?'+'&token='+this.token+'&projectCode='+this.projectCode+'&projectName='+this.projectName+'&corpCode='+this.corpCode
+         
+            },
+            submitForm(){
+                var params = {
+                      token: this.token,
+                    // 'token': '6a81bd8c9c474a2f91ae9af112a26518',
+                      projectCode: this.projectCode,
+                    // 'projectCode': 'PXDDMZJGS_20211111102202789',
+                    id: this.id,
+                    percent:this.nowPercentValue,
+                    corpCode:this.corpCode
+                };
+                axios.post(this.apiUrl + "projectservice/plan/20/reportWorkPlan", params)
+                    .then(res => {
+                        if (res.data.code == '1') {
+                           this.goBackUrl()
+                        }
+                       
+                    })
+                    .catch(err => {
+                        console.error(err);
+                    })
+            },
+            timeFn(newtime) {
+                let time = new Date(newtime)
+                let y = time.getFullYear()
+                let m = time.getMonth() + 1
+                m = m > 9 ? m : '0' + m
+                let d = time.getDate()
+                d = d > 9 ? d : '0' + d
+                let h = time.getHours()
+                h = h > 9 ? h : '0' + h
+                let f = time.getMinutes()
+                f = f > 9 ? f : '0' + f
+                let s = time.getSeconds()
+                s = s > 9 ? s : '0' + s
+                return `${y}-${m}-${d}`
+            },
+        }
+    });
+</script>
+
+
+</html>

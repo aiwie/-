@@ -1,0 +1,138 @@
+/* pages/mycompanyproject/mycompanyproject.wxss */
+/* tab-Start */
+page {
+    overflow: hidden;
+    background: #F2F2F2;
+}
+
+.tab {
+    margin: 8rpx 24rpx 0 22rpx;
+    padding: 8rpx 8rpx 8rpx 10rpx;
+    background: #EAEAEA;
+    border-radius: 8rpx;
+}
+
+.tab_item {
+    text-align: center;
+    line-height: 68rpx;
+    font-size: 32rpx;
+    font-weight: bold;
+    color: #000000;
+}
+
+.tab_item.active {
+    background: #FFFFFF;
+    border-radius: 4px;
+}
+
+/* tab-End */
+
+/* swiper-item-Start */
+swiper {
+    margin: 20rpx 24rpx 0 22rpx;
+}
+
+.swiper-item {
+    padding: 24rpx 24rpx 36rpx 24rpx;
+    margin-bottom: 32rpx;
+    background: #FFFFFF;
+    border-radius: 4px;
+}
+
+.company_item view:first-child {
+    line-height: 58rpx;
+    font-size: 28rpx;
+    font-weight: bold;
+    color: #000000;
+}
+
+.company_item view:nth-last-child(-n+2) {
+    line-height: 48rpx;
+    font-size: 24rpx;
+    color: #9A9A9A;
+}
+
+.project-panel__hd {
+    font-size: 24rpx;
+    color: #777777;
+}
+
+.project-panel__hd .weui-badge {
+    width: 76rpx;
+    height: 36rpx;
+    line-height: 36rpx;
+    margin-right: 20rpx;
+    font-size: 22rpx;
+    border-radius: 4px;
+}
+
+.project-cells {
+    position: relative;
+    margin-top: 30rpx;
+    padding-top: 30rpx;
+}
+
+.project-cells::before {
+    content: " ";
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    height: 2px;
+    border-top: 2px solid var(--weui-FG-3);
+    color: var(--weui-FG-3);
+    -webkit-transform-origin: 0 0;
+    transform-origin: 0 0;
+    -webkit-transform: scaleY(.5);
+    transform: scaleY(.5);
+    z-index: 2;
+}
+
+.project-cell_hd {
+    display: flex;
+    flex-direction: column;
+    width: 140rpx;
+    border: 2rpx solid rgba(112, 112, 112, .15);
+    border-radius: 8rpx;
+    text-align: center;
+}
+
+.project-cell_image {
+    position: relative;
+    height: 106rpx;
+    border-radius: 8rpx 8rpx 0rpx 0rpx;
+    background: #429cf2;
+}
+
+.project-cell_image image {
+    position: absolute;
+    bottom: 0;
+    left: 20%;
+    width: 88rpx;
+    height: 88rpx;
+}
+
+.project-cell_hd {
+    margin-right: 24rpx;
+}
+
+.project-cell_hd text {
+    font-size: 24rpx;
+    color: #222E6A;
+}
+
+.project_title {
+    font-size: 28rpx;
+    font-weight: bold;
+    color: #000000;
+    opacity: 1;
+}
+
+.project_content {
+    line-height: 35rpx;
+    font-size: 20rpx;
+    color: #777777;
+}
+
+
+/* swiper-item-End */

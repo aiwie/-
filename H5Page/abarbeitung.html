@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <!--微信-->
+  <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.3.2.js"></script>
+  <!-- Vant -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@2.12/lib/index.css" />
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6/dist/vue.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vant@2.12/lib/vant.min.js"></script>
+  <!--阿里巴巴图标-->
+  <link rel="stylesheet" href="js/iconfont/iconfont.css" />
+  <!--axios-->
+  <script src="https://cdn.jsdelivr.net/npm/axios@0.21.4/dist/axios.min.js"></script>
+  <title>选择整改人员</title>
+  <style>
+    body {
+      background: #F2F2F2;
+    }
+
+    #contain {
+      margin-top: 10px;
+    }
+
+    /* 搜索框-Start */
+    .van-search__content {
+      background-color: #FFFFFF;
+    }
+
+    .van-index-bar__index {
+      padding: 3px 8px 3px 16px
+    }
+
+    .van-image {
+      margin-right: 10px;
+      overflow: hidden;
+      border-radius: 4px;
+    }
+
+    .contactsname {
+      font-size: 16px;
+      line-height: 40px;
+    }
+
+    /* 搜索框-End */
+
+    /* 联系人列表-Start */
+    .employeeimage {
+      margin-right: 12px;
+      width: 36px;
+      height: 36px;
+    }
+
+    /* 联系人列表-End */
+  </style>
+</head>
+
+<body>
+  <div id="contain">
+    <!--搜索框-->
+    <van-search v-model="searchvalue" shape="round" background="#F2F2F2" placeholder="请输入搜索关键词"></van-search>
+    <!--联系人列表-->
+    <van-index-bar :sticky="false">
+      <template v-for="item in indexList">
+        <van-index-anchor :index="item"> </van-index-anchor>
+        <template v-for="employee in projectEmployeeList">
+          <van-cell v-if="employee.firstChar==item">
+            <van-row type="flex">
+              <van-col class="employeeimage">
+                <van-image width="100%" height="100%" avatarImage :src="employee.avatarImage"></van-image>
+              </van-col>
+              <van-col class="contactsname">
+                <span>{{employee.employeeName}}</span>
+              </van-col>
+            </van-row>
+          </van-cell>
+        </template>
+
+      </template>
+    </van-index-bar>
+  </div>
+</body>
+
+<script src="./js/public.js"></script>
+<script>
+  new Vue({
+    el: "#contain",
+    data: {
+      platCode: getUrlParam('platCode'),
+      corpCode: getUrlParam('corpCode'),
+      projectCode: getUrlParam('projectCode'),
+      token: getUrlParam('token'),
+      userCode: getUrlParam('userCode'),
+      pageType: getUrlParam('pageType'),
+      apiUrl: 'https://site.tieweizhixing.com/',
+      searchvalue: '',
+      indexList: [],//索引栏索引
+      projectEmployeeList: [],//人员信息
+    },
+    created() { },
+    mounted() {
+      this.getProjectEmployeeList();
+    },
+    methods: {
+      getProjectEmployeeList() {//获取整改人员
+        var that = this;
+        var params = {
+          token: that.token,
+          corpCode: that.corpCode
+        };
+        axios.post(that.apiUrl + "/token-service/employee/20/getProjectEmployeeList", params)
+          .then(res => {
+            if (res.data.code == '1') {
+              var list = res.data.data.list;
+              that.indexList = that.getIndexList(list);
+              that.projectEmployeeList = list;
+            }
+          })
+          .catch(err => {
+            console.error(err);
+          })
+      },
+      getIndexList(data) {//获取索引懒索引
+        var indexlist = []
+        for (var i = 0; i < data.length; i++) {
+          if (indexlist.indexOf(data[i].firstChar) == -1) {
+            indexlist.push(data[i].firstChar)
+          }
+        }
+        return indexlist
+      }
+
+    }
+  });
+</script>
+
+
+</html>

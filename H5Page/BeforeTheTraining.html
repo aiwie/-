@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <!--jquery-->
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+  <!--微信-->
+  <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.3.2.js"></script>
+  <!-- Vant -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@2.12/lib/index.css" />
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6/dist/vue.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vant@2.12/lib/vant.min.js"></script>
+  <!--axios-->
+  <script src="https://cdn.jsdelivr.net/npm/axios@0.21.4/dist/axios.min.js"></script>
+  <!--高德地图-->
+  <script
+    src="https://webapi.amap.com/maps?v=1.4.15&key=aaf1ef61096f6ec64b68ee37491572d7&plugin=AMap.PolyEditor,AMap.CircleEditor,AMap.Geocoder,AMap.MouseTool,AMap.MarkerClusterer,AMap.DistrictSearch">
+    </script>
+  <!--地点位置数据-->
+  <script src="js/arealist.js"></script>
+  <title>班前培训上报 </title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    /* 表单-Start*/
+    .form {
+      margin: 15px;
+      margin-bottom: 70px;
+    }
+
+    .van-cell {
+      margin-top: 8px;
+      background: #F1F3F5;
+      border-radius: 8px;
+    }
+
+    #container {
+      width: 100%;
+      height: 10rem;
+      margin-top: 5px;
+    }
+
+    .amap-geolocation-con {
+      z-index: 1 !important;
+    }
+
+
+    /* 表单-End */
+
+
+    /* 确认按钮-Start*/
+    .button {
+      position: fixed;
+      width: 100%;
+      height: 60px;
+      bottom: 0;
+      background: #F2F2F2;
+      border-top: 1px solid #E2E2E2;
+    }
+
+    /* 确认按钮-End */
+  </style>
+</head>
+
+<body>
+  <div id="contain">
+    <!--表单-->
+    <van-form class="form">
+      <h4>基本资料</h4>
+      <van-field v-model="teacher" label="主讲人" placeholder="请输入主讲人" input-align="right"></van-field>
+      <van-field v-model="peoplecount" label="作业人数" placeholder="请输入作业人数" input-align="right"></van-field>
+      <van-field title="作业班组" label="作业班组" is-link name="className" :value="className" placeholder="请选择班组"
+        input-align="right" @click="workteamShowPicker = true" readonly="true">
+      </van-field>
+      <van-divider></van-divider>
+
+      <h4>培训内容</h4>
+      <van-field v-model="content" rows="2" autosize type="textarea" maxlength="100" placeholder="请输入培训内容"
+        show-word-limit></van-field>
+      <van-divider></van-divider>
+
+      <h4>图片</h4>
+      <van-row type="flex" style="margin-top: 10px;">
+        <van-uploader v-model="images" :before-read="uploadImage" :capture="mobilePhone == 'ios' ? '' : 'camera'"
+          multiple></van-uploader>
+      </van-row>
+      <van-divider></van-divider>
+      <van-row type="flex" justify="space-between">
+        <van-col>
+          <h4>培训地点</h4>
+        </van-col>
+      </van-row>
+      <van-cell title="培训地点" is-link name="problemlocation" :value="areaName==''?'选择培训地点':areaName"
+        @click="areashow = true">
+      </van-cell>
+      <van-field style="margin-top: 1px;" v-model="address" label="详细地址" placeholder="请输入详细地址或点击地图" input-align="right">
+      </van-field>
+      <div id="container"> </div>
+    </van-form>
+
+    <!--确认按钮-->
+    <div class="button" v-show="!workteamShowPicker && !areashow">
+      <van-row type="flex" justify="space-around" style="height: 100%;align-items:center;">
+        <van-col span="11">
+          <van-button type="info" block round color="#C5C8D2" @click="goBackUrl">取消</van-button>
+        </van-col>
+        <van-col span="11">
+          <van-button type="info" block round color="#6A8AF0" v-on:click="submitForm">提交</van-button>
+        </van-col>
+      </van-row>
+    </div>
+    <!--底部弹出选项-->
+    <van-popup v-model="workteamShowPicker" position="bottom">
+      <van-picker show-toolbar :columns="workteamColumns" title="作业班组" @confirm="tworkteamOnConfirm"
+        @cancel="workteamShowPicker = false" value-key='teamName'></van-picker>
+    </van-popup>
+    <van-popup v-model="areashow" position="bottom">
+      <van-area @confirm="areaOnConfirm" title="培训地点" :area-list="areaList"></van-area>
+    </van-popup>
+  </div>
+
+</body>
+
+
+<script src="./js/public.js"></script>
+<script>
+  var vm = new Vue({
+    el: "#contain",
+    data: {
+      platCode: getUrlParam('platCode'),
+      corpCode: getUrlParam('corpCode'),
+      projectCode: getUrlParam('projectCode'),
+      token: getUrlParam('token'),
+      userCode: getUrlParam('userCode'),
+      userName: getUrlParam('userName'),
+      projectId: getUrlParam('projectId'),
+      mobilePhone: getUrlParam('mobilePhone'),
+      apiUrl: 'https://site.tieweizhixing.com', //接口domain
+      workteamColumns: [], //作业班组
+      workteamShowPicker: false,//显示作业班组选项
+      areashow: false,//显示地点选项
+      teacher: '',//整改人
+      peoplecount: '',//作业人数
+      className: '', //作业班组显示名称
+      content: '',//培训内容
+      images: [], // 图片
+      areaName: '', //培训地点显示名称
+      address: '', //详细地址
+      formData: { //表单数据
+        platCode: getUrlParam('platCode'), //平台代码
+        corpCode: getUrlParam('corpCode'), //公司代码
+        projectCode: getUrlParam('projectCode'), //项目代码
+        userCode: getUrlParam('userCode'), //上报人编码
+        userName: decodeURI(getUrlParam('userName')), //上报人姓名
+        reportTypeCode: "classtrain", //上报类型:安全问题safety,质量问题quality,班前培训classtrain,施工日志worklog
+        reportGps: [], //培训地点gps定位
+        reportDate: new Date(), //报告日期
+        content: [], //不同类型需上报的数据
+      },
+    },
+    created() { },
+    mounted() {
+      this.getProjectList()
+      this.getTeamList();
+    },
+    methods: {
+      getProjectList() { // 调用 整个项目记录
+        axios.post(this.apiUrl + "/token-service/project/20/selectEmployeeProjectList", {
+          token: this.token
+        })
+          .then(res => {
+            if (res.data.code == '1') {
+              res.data.data.list.forEach(item => {
+                if (item.projectId == this.projectId) {
+                  // this.formData.reportGps = [JSON.parse(item.gpsFence)[0].lng, JSON.parse(item.gpsFence)[0].lat]
+                  electronicRail(JSON.parse(item.gpsFence))
+                  fistRegeoCode(JSON.parse(item.gpsFence)[0].lng, JSON.parse(item.gpsFence)[0].lat)
+                }
+              })
+            } else {
+              console.log('整个项目记录');
+            }
+          })
+          .catch(err => {
+          })
+      },
+      tworkteamOnConfirm(data) {
+        this.className = data.teamName;
+        this.workteamShowPicker = false;
+      },
+      getTeamList() { //获取“班组”列表
+        var that = this;
+        var params = {
+          token: that.token,
+          projectCode: this.projectCode,
+          pageSize: "999",
+          pageNum: "0"
+        };
+        axios.post(that.apiUrl + '/projectservice/team/20/getTeamList', params)
+          .then(res => {
+            that.workteamColumns = res.data.data.list;
+          })
+          .catch(err => {
+            console.error(err);
+          })
+      },
+      uploadImage(file) { //图片上传
+        var that = this;
+        var formData = new FormData();
+        formData.append("token", this.token);
+        formData.append("uploadPath", 'safetyImage');
+        formData.append("myfiles0", file);
+        axios.post(that.apiUrl + "/file-service/upload/uploadfiles", formData)
+          .then(res => {
+            var data = {
+              url: res.data.data.myfiles0
+            };
+            that.images.push(data)
+          }).catch(err => {
+            Toast.$fail(err);
+          })
+      },
+      areaOnConfirm(date) { //地区选择
+        var that = this;
+        var areaname = '';
+        date.forEach(item => {
+          areaname += item.name + "\xa0"
+        });
+        that.areaName = areaname;
+        that.areashow = false;
+        geoCode(areaname);
+      },
+      submitForm() { //提交
+        var that = this;
+        if (that.formValidator()) {
+          return;
+        }
+        var params = that.formData;
+        var content = that.setFormContent();
+        params["content"] = content;
+        axios.post(that.apiUrl + "/projectservice/report/20/addReportData", params)
+          .then(res => {
+            if (res.data.code == '1') {
+              that.$toast.success('上报成功！');
+              that.goBackUrl()
+            } else {
+              that.$toast(res.data.msg);
+              return;
+            }
+          }).catch(err => {
+            console.error(err);
+          })
+      },
+      goBackUrl() { // 取消返回上一层
+        window.history.go(-1)
+      },
+      formValidator() {
+        var that = this;
+        if (that.teacher == '') {
+          that.$toast.fail('请输入整改人！');
+          return true;
+        }
+        if (that.peoplecount == '') {
+          that.$toast.fail('请输入作业人数！');
+          return true;
+        }
+        if (that.className == '') {
+          that.$toast.fail('请选择作业班组！');
+          return true;
+        }
+        if (that.content == '') {
+          that.$toast.fail('请输入培训内容！');
+          return true;
+        }
+        if (that.images.length <= 0) {
+          that.$toast.fail('请上传问题图片！');
+          return true;
+        }
+        if (that.formData.reportGps == '') {
+          that.$toast.fail('请选择培训地点！');
+          return true;
+        }
+        if (that.address == '') {
+          that.$toast.fail('请输入详细地址！');
+          return true;
+        }
+        return false;
+      },
+      setFormContent() { //设置表单内容
+        var that = this;
+        var images = [];
+        that.images.forEach(item => {
+          images.push(item.url)
+        });
+        return {
+          data: [{
+            "key": "teacher",
+            "name": "整改人",
+            "value": that.teacher
+          }, {
+            "key": "peoplecount",
+            "name": "培训人数",
+            "value": that.peoplecount
+          },
+          {
+            "key": "class",
+            "name": "培训班组",
+            "value": that.className
+          },
+          {
+            "key": "content",
+            "name": "培训内容",
+            "value": that.content
+          },
+          {
+            "key": "image",
+            "name": "图片",
+            "value": images
+          },
+          {
+            "key": "address",
+            "name": "详细地点",
+            "value": that.address
+          }]
+        };
+      }
+
+
+    }
+  });
+
+
+  var map = new AMap.Map("container", {
+    resizeEnable: true, //启用调整大小
+    dragEnable: true, //拖动
+    zoom: 10,
+  });
+
+  // AMap.plugin('AMap.Geolocation', function () {
+  //     var geolocation = new AMap.Geolocation({
+  //         enableHighAccuracy: true, //是否使用高精度定位，默认:true
+  //         timeout: 10000, //超过10秒后停止定位，默认：5s
+  //         buttonPosition: 'RB', //定位按钮的停靠位置
+  //         buttonOffset: new AMap.Pixel(10, 20), //定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
+  //         zoomToAccuracy: true, //定位成功后是否自动调整地图视野到定位点
+  //     });
+  //     map.addControl(geolocation);
+  // });
+
+  var lnglats = [];
+  var markers = [];
+  var marker = new AMap.Marker();
+  var geocoder = new AMap.Geocoder({});
+
+  // 设置地图中心的及层级 - 电子围栏
+  function electronicRail(val) {
+    let newGpsFen = []
+    val.forEach(item => {
+      newGpsFen.push([item.lng, item.lat])
+    })
+    var polygon = new AMap.Polygon({
+      path: newGpsFen,
+      fillColor: '#5ea8e699', // 多边形填充颜色
+      strokeColor: '#fff', // 线条颜色
+      map: map
+    })
+    this.contentGps = polygon.getBounds().getCenter()
+    this.map.setFitView([polygon], true)
+    showInfo(polygon)
+  }
+  /*设置覆盖物点标记*/
+  function showInfo(polygon) {
+    polygon.on('click', function (e) {
+      clear();
+      if (lnglats.length < 1) {
+        lnglats.push(e.lnglat);
+        var index = lnglats.length;
+        marker.setPosition(e.lnglat);
+        markers.push(marker);
+        map.add(marker);
+        vm.formData.reportGps = lnglats[0].lng + ',' + lnglats[0].lat
+        regeoCode()
+      }
+    });
+  }
+  /*设置点标记*/
+  // map.on('click', function (e) {
+  //   clear();
+  //   if (lnglats.length < 1) {
+  //     lnglats.push(e.lnglat);
+  //     var index = lnglats.length;
+  //     marker.setPosition(e.lnglat);
+  //     markers.push(marker);
+  //     map.add(marker);
+  //     regeoCode()
+  //   }
+  // });
+  /*删除位置*/
+  function clear() {
+    map.remove(markers);
+    markers = [];
+    lnglats = [];
+  };
+  /*经纬度转地址*/
+  function regeoCode() {
+    geocoder.getAddress(lnglats, function (status, result) {
+      var address = []
+      vm.address = ''
+      if (status === 'complete' && result.regeocodes.length) {
+        for (var i = 0; i < result.regeocodes.length; i += 1) {
+          if (!vm.address) {
+            vm.address = result.regeocodes[i].formattedAddress;
+          }
+        }
+      } else {
+        console.error(result)
+      }
+    });
+  }
+  /*地址转经纬度*/
+  function geoCode(address) {
+    geocoder.getLocation(address, function (status, result) {
+      if (status === 'complete' && result.geocodes.length) {
+        var lnglat = result.geocodes[0].location
+        vm.formData.reportGps = lnglat.lng + ',' + lnglat.lat;
+        marker.setPosition(lnglat);
+        map.add(marker);
+        map.setFitView(marker);
+      } else {
+        console.error(result)
+      }
+    });
+  }
+  /*首次经纬度转地址*/
+  function fistRegeoCode(lng, lat) {
+    let coorList = [lng, lat]
+    geocoder.getAddress(coorList, function (status, result) {
+      if (status === 'complete' && result.regeocode) {
+        vm.areaName = result.regeocode.addressComponent.province + ' ' + result.regeocode.addressComponent.city + ' ' + result.regeocode.addressComponent.district
+      } else {
+        console.error(result)
+      }
+    });
+  }
+</script>
+
+
+</html>

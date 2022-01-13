@@ -1,0 +1,111 @@
+/*通用标签样式-Start*/
+.label {
+  display: inline;
+  padding: .2em .6em .3em;
+  font-size: 75%;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: .25em
+}
+
+.label.label-success {
+  background-color: #009F00;
+}
+
+.label.label-warning {
+  background-color: #EEA600;
+}
+
+.label.label-error {
+  background-color: #f30202;
+}
+
+/*通用标签样式-End*/
+
+
+/*通用按钮样式-Start*/
+.btn {
+  display: inline-block;
+  padding: 6px 12px;
+  margin-bottom: 0;
+  line-height: 1.42857143;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  -ms-touch-action: manipulation;
+  touch-action: manipulation;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background-image: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+.btn.btn-primary{
+  color: #fff !important;
+  background-color: #00a3e4 !important;
+  border-color: #00a3e4;
+ 
+}
+/*通用按钮样式-End*/
+
+/* top 通用样式*/
+.top {
+  position: relative;
+  height: 210rpx;
+}
+
+.top-img {
+  z-index: 1;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 1;
+  border-radius: 0px;
+}
+
+.top-border {
+  z-index: 2;
+  margin: 24rpx;
+  height: 220rpx;
+  border-radius: 8rpx;
+  background: #FFFFFF;
+  box-shadow: 0rpx 6rpx 12rpx rgba(16, 135, 240, 0.2);
+  opacity: 1;
+}
+
+.top-list-title {
+  margin-top: 36rpx;
+  text-align: center;
+  font-size: var(--textfont);
+}
+
+.top-list-count {
+  text-align: center;
+  line-height: 80rpx;
+  font-size: var(--focusfont);
+  font-weight: bold;
+}
+
+.top-list-new {
+  text-align: center;
+  font-size: var(--textfont);
+}
+
+.top-list-new text:nth-child(1) {
+  color: #929292;
+}
+
+.top-list-new text:nth-child(2) {
+  color: #929292;
+}
+
+.top-list-new text:nth-last-child(1) {
+  color: #009F00;
+}

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <!--jquery-->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <!--微信-->
+    <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.3.2.js"></script>
+    <!-- Vant -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@2.12/lib/index.css" />
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6/dist/vue.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vant@2.12/lib/vant.min.js"></script>
+    <!--阿里巴巴图标-->
+    <link rel="stylesheet" href="js/iconfont/iconfont.css" />
+    <!--axios-->
+    <script src="https://cdn.jsdelivr.net/npm/axios@0.21.4/dist/axios.min.js"></script>
+    <!--moment时间过滤-->
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.js"></script>
+    <!--echarts-->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.2.0/dist/echarts.min.js"></script>
+    <title>环境监控详情</title>
+    <style>
+        body {
+            background: #F2F2F2;
+        }
+
+
+        /* 日期选择-Start*/
+        .dateselection {
+            line-height: 48px;
+            font-size: 14px;
+            color: #646A73;
+            background: #FFFFFF;
+        }
+
+        .iconfont {
+            font-size: 16px;
+        }
+
+        /* 日期选择-End*/
+
+
+        /* 详细列表-Start*/
+        .item {
+            margin: 12px;
+            padding: 12px;
+            background: #FFFFFF;
+            border-radius: 8px;
+        }
+
+        .monitoring-name {
+            font-size: 14px;
+            font-weight: bold;
+            color: #222E6A;
+        }
+
+        .monitoring-unit {
+            font-size: 10px;
+            color: #646A73
+        }
+
+        /* 详细列表-Start*/
+    </style>
+</head>
+
+<body>
+    <div id="contain">
+        <!--时间选择-->
+        <van-sticky>
+            <van-sticky>
+                <van-row type="flex" justify="space-between">
+                    <van-cell title="选择日期" is-link :value="timevalue|datefmt" @click="timeshow = true"></van-cell>
+                    <van-popup v-model="timeshow" position="bottom">
+                        <van-datetime-picker @confirm="timeOnConfirm" v-model="timevalue" type="date">
+                        </van-datetime-picker>
+                    </van-popup>
+                </van-row>
+            </van-sticky>
+        </van-sticky>
+
+        <template v-for="(item, index) in hisdata" :key="index">
+            <div class="item">
+                <van-row type="flex" justify="space-between">
+                    <van-col class="monitoring-name">{{item.paraName|paradict}}</van-col>
+                    <van-col class="monitoring-unit">单位：ug/m³</van-col>
+                </van-row>
+                <div :id="item.paraName" style="width: 100%;height:200px;"></div>
+            </div>
+        </template>
+
+
+        <!-- <div class="item">
+            <van-row type="flex" justify="space-between">
+                <van-col class="monitoring-name">PM2.5数据</van-col>
+                <van-col class="monitoring-unit">单位：ug/m³</van-col>
+            </van-row>
+            <div id="pm25Charts" style="width: 100%;height:200px;"></div>
+        </div>
+
+ 
+        <div class="item">
+            <van-row type="flex" justify="space-between">
+                <van-col class="monitoring-name">PM10数据</van-col>
+                <van-col class="monitoring-unit">单位：ug/m³</van-col>
+            </van-row>
+            <div id="pm10Charts" style="width: 100%;height:200px;"></div>
+        </div>
+
+       
+        <div class="item">
+            <van-row type="flex" justify="space-between">
+                <van-col class="monitoring-name">风速</van-col>
+                <van-col class="monitoring-unit">单位：m/s</van-col>
+            </van-row>
+            <div id="windCharts" style="width: 100%;height:200px;"></div>
+        </div> -->
+    </div>
+</body>
+
+<script>
+    var date = new Date();
+    new Vue({
+        el: "#contain",
+        data: {
+            apiUrl: 'https://site.tieweizhixing.com',
+            hisdata: [],//详情数据
+            timevalue: date, //筛选时间
+            timeshow: false,//显示时间选择
+            token:'',
+            faciCode:""
+        },
+        created() {
+            this.faciCode = this.getQueryString('faciCode')
+            this.token = this.getQueryString('token')
+         },
+        mounted() {
+            this.getHisDataByPara();
+        },
+        methods: {
+            timeOnConfirm(date) {
+                this.timeshow = false;
+                this.timevalue = date;
+                this.getHisDataByPara();
+            },
+            getHisDataByPara() {
+                var that = this;
+                var params = {
+                    // "token": "a037d5ac3688431191c7475230c28160",
+                    "token": this.token,
+                    // "faciCode": "envitest001",
+                    "faciCode": this.faciCode,
+                    "curTime": moment(that.timevalue).format('YYYY-MM-DD')
+                };
+                axios.post(that.apiUrl + "/iotservice/dvData/20/getHisDataByPara", params)
+                    .then(res => {
+                        if (res.data.code == '1') {
+                            that.hisdata = res.data.data;
+                            that.$nextTick(function () {
+                                that.setEcharts();
+                            });
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                    })
+            },
+            setEcharts() {
+                var that = this;
+                that.hisdata.forEach(element => {
+                    var echartsId = echarts.init(document.getElementById(element.paraName))
+                    echartsId.setOption(that.setData(element))
+                });
+            },
+            setData(chartsData) {
+                var color = "rgba(32, 64, 255, 1)";
+                var shadowColor = "rgba(32, 64, 255, 0.3)";
+                if (chartsData.paraName == "pm10") {
+                    var color = "rgba(171, 67, 255, 1)";
+                    var shadowColor = "rgba(171, 67, 255, 0.3)";
+                }
+                if (chartsData.paraName == "wind") {
+                    var color = "rgba(17, 197, 158, 1)";
+                    var shadowColor = "rgba(17, 197, 158, 0.3)";
+                }
+                /*设置charts参数*/
+                return {
+                    color: color,
+                    grid: { //设置图表位置
+                        top: "10%",
+                        left: 0,
+                        right: 0,
+                        bottom: '3%',
+                        containLabel: true
+                    },
+                    xAxis: {
+                        type: 'category',
+                        data: chartsData.dates,
+                        axisLabel: {
+                            show: true,
+                            textStyle: {
+                                fontSize: 8 //更改坐标轴文字大小
+                            },
+                        },
+                    },
+                    yAxis: {
+                        type: 'value',
+                        boundaryGap: [0, '100%'],
+                    },
+                    series: [{
+                        data: chartsData.values,
+                        type: 'line',
+                        smooth: true,
+                        label: {
+                            normal: {
+                                fontSize: 8,
+                                show: true, //折点显示数值,
+                                position: "top"
+                            }
+                        },
+                        symbolSize: 5, //折线点的大小，必须加这个，折点上方的数值才会显示
+                        lineStyle: { //设置阴影
+                            width: 3,
+                            shadowColor: shadowColor,
+                            shadowBlur: 10,
+                            shadowOffsetY: 8
+                        }
+                    }]
+                }
+            },
+            getQueryString(name) {
+                var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+                var r = window.location.search.substr(1).match(reg);
+                if (r != null) return unescape(r[2]); return null;
+            }
+        },
+        filters: {
+            datefmt(date) {
+                if (date) {
+                    return this.moment(date).format('YYYY/MM/DD');
+                } else {
+                    return "";
+                }
+            },
+            paradict(key) {
+                var dict = {
+                    windspeed: "风速", windscale: "风力", winddirection: "风向", winddirectionbig: "风向角度", humidityvalue: "湿度",
+                    temperaturevalue: "温度", noisevalue: "噪声", pm25: "pm2.5", pm10: "pm10", tspvalue: "tsp", pressurevalue: "大气压",
+                    luxvalue: "lwx"
+                };
+                return dict[key]
+
+            }
+        }
+    });
+</script>
+
+
+</html>

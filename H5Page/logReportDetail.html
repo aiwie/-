@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <!--jquery-->
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+  <!--微信-->
+  <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.3.2.js"></script>
+  <!-- Vant -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@2.12/lib/index.css" />
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6/dist/vue.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vant@2.12/lib/vant.min.js"></script>
+  <!--阿里巴巴图标-->
+  <link rel="stylesheet" href="js/iconfont/iconfont.css" />
+  <!--axios-->
+  <script src="https://cdn.jsdelivr.net/npm/axios@0.21.4/dist/axios.min.js"></script>
+  <!--高德地图-->
+  <script
+    src="https://webapi.amap.com/maps?v=1.4.15&key=aaf1ef61096f6ec64b68ee37491572d7&plugin=AMap.PolyEditor,AMap.CircleEditor,AMap.Geocoder,AMap.MouseTool,AMap.MarkerClusterer,AMap.DistrictSearch">
+    </script>
+  <!--地点位置数据-->
+  <script src="js/arealist.js"></script>
+  <title>日志上报详情</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    /* 表单-Start*/
+    .form {
+      margin: 15px;
+    }
+
+    .van-cell {
+      margin-top: 8px;
+      background: #F1F3F5;
+      border-radius: 8px;
+    }
+
+    .weather {
+      margin-top: 17px;
+      padding: 20px 9px 23px 11px;
+      color: #FFFFFF;
+      background: url(image/weather-image.png);
+      background-repeat: no-repeat;
+      background-size: 100% 100%;
+      background-size: cover;
+    }
+
+    .weather-geog {
+      line-height: 25px;
+    }
+
+    .voice {
+      margin-top: 8px;
+      line-height: 42px;
+      height: 42px;
+      background: #F1F3F5;
+      opacity: 0.6;
+      border-radius: 8px;
+    }
+
+    .voice i {
+      margin-top: 0px;
+      font-size: 20px;
+      margin-left: 10px;
+      margin-right: 10px;
+    }
+
+    .voice span {
+      font-size: 16px;
+      color: #8A8A8A;
+    }
+
+    #container {
+      width: 100%;
+      height: 10rem;
+      margin-top: 5px;
+    }
+
+
+    /* 表单-End */
+  </style>
+</head>
+
+<body>
+  <div id="contain">
+    <!--表单-->
+    <van-form class="form">
+      <h4>日志名称</h4>
+      <van-field :value="getReportDataContent('name')" label="日志名称" placeholder="日志名称" input-align="right" readonly>
+      </van-field>
+      <van-field :value="getReportDataContent('weather')" label="天气情况" placeholder="天气情况" input-align="right" readonly>
+      </van-field>
+
+      <h4 style="margin-top: 10px;">日志内容</h4>
+      <van-field :value="getReportDataContent('content')" rows="2" autosize type="textarea" maxlength="100"
+        placeholder="日志内容" show-word-limit readonly></van-field>
+      <van-divider></van-divider>
+
+      <!-- <h4>语音输入</h4>
+      <div class="voice">
+        <i class="iconfont icon-yuyin"></i><span> 60″</span>
+      </div>
+      <van-divider></van-divider> -->
+
+      <h4>图片</h4>
+      <van-row type="flex" style="margin-top: 10px;">
+        <template v-for="(item, index) in images" :key="index">
+          <van-image width="80" height="80" :src="item" style="margin:0 8px 8px 0;" @click="showImgPopup(item)">
+          </van-image>
+        </template>
+      </van-row>
+      <van-popup v-model="imgShow">
+        <van-image style="margin-bottom: -5px;" width="300" height="300" :src="imgShowUrl" />
+      </van-popup>
+      <van-divider></van-divider>
+
+      <h4>地点</h4>
+      <van-field :value="areaName" label="日志地址" placeholder="日志地址" input-align="right" readonly></van-field>
+      <van-field style="margin-top: 1px;" :value="getReportDataContent('address')" label="详细地址" placeholder="详细地址"
+        input-align="right" readonly></van-field>
+      <div id="container"> </div>
+      <van-divider></van-divider>
+
+    </van-form>
+
+
+  </div>
+</body>
+
+<script src="./js/public.js"></script>
+<script>
+  var vm = new Vue({
+    el: "#contain",
+    data: {
+      platCode: getUrlParam('platCode'),
+      corpCode: getUrlParam('corpCode'),
+      projectCode: getUrlParam('projectCode'),
+      token: getUrlParam('token'),
+      userCode: getUrlParam('userCode'),
+      userName: getUrlParam('userName'),
+      projectId: getUrlParam('projectId'),
+      reportId: getUrlParam('reportId'),
+      apiUrl: 'https://site.tieweizhixing.com/',
+      reportDataDetail: '',//上报详情
+      areaName: '',//地点
+      images: [], //日志图片
+      imgShow: false, // 点击图片展开大图
+      imgShowUrl: '' // 大图展示地址
+    },
+    created() { },
+    mounted() {
+      this.getReportDataDetail();
+      this.getProjectList()
+    },
+    methods: {
+      showImgPopup(item) {
+        if (item) {
+          this.imgShowUrl = ''
+          this.imgShowUrl = item
+          this.imgShow = true
+        }
+      },
+      getProjectList() { // 调用 整个项目记录
+        axios.post(this.apiUrl + "/token-service/project/20/selectEmployeeProjectList", {
+          token: this.token
+        })
+          .then(res => {
+            if (res.data.code == '1') {
+              res.data.data.list.forEach(item => {
+                if (item.projectId == this.projectId) {
+                  electronicRail(JSON.parse(item.gpsFence))
+                  fistRegeoCode(JSON.parse(item.gpsFence)[0].lng, JSON.parse(item.gpsFence)[0].lat)
+                }
+              })
+            } else {
+              console.log('整个项目记录');
+
+            }
+          })
+          .catch(err => {
+          })
+      },
+      getReportDataDetail() {//取上报数据详情
+        var that = this;
+        var params = {
+          "reportId": this.reportId
+        };
+        axios.post(that.apiUrl + "/projectservice/report/20/getReportDataDetail", params)
+          .then(res => {
+            if (res.data.code == '1') {
+              that.reportDataDetail = res.data.data;
+              let gps = res.data.data.reportGps.split(',');
+              this.reportGps = [Number(gps[0]), Number(gps[1])]
+              var images = res.data.data.content.data.filter(x => x.key === "image");
+              if (images.length == 1) {
+                that.images = images[0].value;
+              }
+              console.log(res.data.data, '111')
+            }
+          })
+          .catch(err => {
+            console.error(err);
+          })
+      },
+      getReportDataContent(contentkey) {//获取详情
+        var that = this;
+        if (that.reportDataDetail) {
+          var data = that.reportDataDetail.content.data;
+          var object = data.filter(x => x.key === contentkey);
+          if (object.length == 1) {
+
+            return object[0].value;
+          }
+          else {
+            return '';
+          }
+        }
+      }
+    },
+  });
+
+  var map = new AMap.Map("container", {
+    resizeEnable: true, //启用调整大小
+    dragEnable: true, //拖动
+    zoom: 12,
+  });
+
+  // AMap.plugin('AMap.Geolocation', function () {
+  //     var geolocation = new AMap.Geolocation({
+  //         enableHighAccuracy: true, //是否使用高精度定位，默认:true
+  //         timeout: 10000, //超过10秒后停止定位，默认：5s
+  //         buttonPosition: 'RB', //定位按钮的停靠位置
+  //         buttonOffset: new AMap.Pixel(10, 20), //定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
+  //         zoomToAccuracy: true, //定位成功后是否自动调整地图视野到定位点
+  //     });
+  //     map.addControl(geolocation);
+  // });
+
+  var lnglats = [];
+  var markers = [];
+  var marker = new AMap.Marker();
+  var geocoder = new AMap.Geocoder({});
+  /*设置点标记*/
+  // map.on('click', function (e) {
+  //   clear();
+  //   if (lnglats.length < 1) {
+  //     lnglats.push(e.lnglat);
+  //     var index = lnglats.length;
+  //     marker.setPosition(e.lnglat);
+  //     markers.push(marker);
+  //     map.add(marker);
+  //   }
+  // });
+
+  // 设置地图中心的及层级 - 电子围栏
+  function electronicRail(val) {
+    let newGpsFen = []
+    val.forEach(item => {
+      newGpsFen.push([item.lng, item.lat])
+    })
+    var polygon = new AMap.Polygon({
+      path: newGpsFen,
+      fillColor: '#5ea8e699', // 多边形填充颜色
+      strokeColor: '#fff', // 线条颜色
+      map: map
+    })
+    this.contentGps = polygon.getBounds().getCenter()
+    this.map.setFitView([polygon], true)
+    // 点位
+    marker.setPosition(vm.reportGps);
+    map.add(marker);
+  }
+  /*删除位置*/
+  function clear() {
+    map.remove(markers);
+    markers = [];
+    lnglats = [];
+  };
+  /*经纬度转地址*/
+  function regeoCode(lnglats) {
+    geocoder.getAddress(lnglats, function (status, result) {
+      var address = [];
+      if (status === 'complete' && result.regeocode) {
+        var address = result.regeocode.addressComponent;
+        var areaName = address.province + "\xa0" + address.city + "\xa0" + address.district
+        vm.areaName = areaName;
+        geoCode(areaName);
+      } else {
+        console.log('根据经纬度查询地址失败');
+
+      }
+    });
+  }
+  /*地址转经纬度和点标记*/
+  function geoCode(address) {
+    geocoder.getLocation(address, function (status, result) {
+      if (status === 'complete' && result.geocodes.length) {
+        var lnglat = result.geocodes[0].location
+        marker.setPosition(lnglat);
+        map.add(marker);
+        map.setFitView(marker);
+      } else {
+        console.error(result)
+      }
+    });
+  }
+  /*首次经纬度转地址*/
+  function fistRegeoCode(lng, lat) {
+    let coorList = [lng, lat]
+    geocoder.getAddress(coorList, function (status, result) {
+      if (status === 'complete' && result.regeocode) {
+        vm.areaName = result.regeocode.addressComponent.province + ' ' + result.regeocode.addressComponent.city + ' ' + result.regeocode.addressComponent.district
+      } else {
+
+      }
+    });
+  }
+</script>
+
+
+</html>

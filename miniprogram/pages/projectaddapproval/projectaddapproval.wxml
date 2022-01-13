@@ -1,0 +1,115 @@
+<!--pages/addapproval/addapproval.wxml-->
+<view class="page">
+    <!-- 基本信息 -->
+    <view class="page__bd">
+        <view class="weui-cells__title">基本信息</view>
+        <view class="weui-cells weui-cells_after-title">
+            <view class="weui-cell">
+                <view class="weui-cell__bd">项目名称</view>
+                <view class="weui-cell__ft">XXXX公司</view>
+            </view>
+            <view class="weui-cell">
+                <view class="weui-cell__bd">立项日期</view>
+                <view class="weui-cell__ft">2021-12-01</view>
+            </view>
+            <view class="weui-cell">
+                <view class="weui-cell__bd">项目地址</view>
+                <view class="weui-cell__ft">洪山市洪山区洪山街道123号</view>
+            </view>
+            <view class="weui-cell">
+                <view class="weui-cell__bd">联系人</view>
+                <view class="weui-cell__ft">张三</view>
+            </view>
+            <view class="weui-cell">
+                <view class="weui-cell__bd">联系电话</view>
+                <view class="weui-cell__ft">13015963214</view>
+            </view>
+            <view class="weui-cell">
+                <view class="weui-cell__bd">发起人</view>
+                <view class="weui-cell__ft">李四</view>
+            </view>
+        </view>
+    </view>
+    <!-- 授权信息 -->
+    <view class="page__bd">
+        <view class="weui-cells__title">项目授权</view>
+    </view>
+    <!-- 更变列表 -->
+    <!--
+ <view class="changecontent">
+        <view class="weui-cells_checkbox">
+            <checkbox-group bindchange="checkboxChange">
+                <view class="checkboxs">
+                    <block wx:for="{{checkboxItems}}" wx:key="value">
+                        <view class="checkboxs_flex ">
+                            <label class="checkboxs" style="flex: 0 0 218rpx;">
+                                <view class="checkboxs__hd">
+                                    <checkbox class="weui-check" value="{{item.value}}" checked="{{item.checked}}" />
+                                    <i class="weui-icon-checked"></i>
+                                </view>
+                                <view class="checkboxs__bd">
+                                    <text>
+                                        {{item.name}}
+                                    </text>
+                                </view>
+                            </label>
+                        </view>
+
+                    </block>
+                </view>
+            </checkbox-group>
+        </view>
+    </view>
+
+
+    -->
+    <view class="changecontent">
+        <view class="weui-flex weui-flex_wrap">
+            <view class="weui-flex__item weui-flex__item_flex">
+                <view class="changecontent-list">
+                    <text>视频监控</text>
+                </view>
+            </view>
+            <view class="weui-flex__item weui-flex__item_flex">
+                <view class="changecontent-list">
+                    <text>劳务实名制</text>
+                </view>
+            </view>
+            <view class="weui-flex__item weui-flex__item_flex">
+                <view class="changecontent-list">
+                    <text>塔吊检测</text>
+                </view>
+            </view>
+            <view class="weui-flex__item weui-flex__item_flex">
+                <view class="changecontent-list">
+                    <text>升降机检测</text>
+                </view>
+            </view>
+            <view class="weui-flex__item weui-flex__item_flex">
+                <view class="changecontent-list">
+                    <text>卸料平台检测</text>
+                </view>
+            </view>
+            <view class="weui-flex__item weui-flex__item_flex">
+                <view class="changecontent-list">
+                    <text>卸料平台检测</text>
+                </view>
+            </view>
+        </view>
+    </view>
+    <!--按钮-->
+    <view class="btnarea" wx:if="{{showbtn=='yes'}}">
+        <view class="weui-flex">
+            <view class="weui-flex__item">
+                <view class="placeholder">
+                    <a class="weui-btn weui-btn-yes">同意</a>
+                </view>
+            </view>
+            <view class="weui-flex__item">
+                <view class="placeholder">
+                    <a class="weui-btn weui-btn-no">拒绝</a>
+                </view>
+            </view>
+        </view>
+    </view>
+</view>

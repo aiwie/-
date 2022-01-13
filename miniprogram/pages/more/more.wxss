@@ -1,0 +1,41 @@
+/* pages/more/more.wxss */
+@import "/dist/css/general.wxss";
+page {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+  }
+.top-border {
+    padding-top: 40rpx;
+    height: 264rpx;
+}
+
+.user-header-avatar {
+    width: 124rpx;
+    height: 124rpx;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.user-header-name {
+    font-size: 36rpx;
+    font-weight: 400;
+    color: #191919;
+    opacity: 1;
+}
+
+.user-header-id {
+    font-size: 20rpx;
+    font-weight: 400;
+    color: #191919;
+    opacity: 0.5
+}
+
+.userinfo{
+    text-align: center;
+    font-size: 18px;
+    line-height: 46px;
+    border-top: 1px solid #9e9e9e47;
+    border-bottom: 1px solid #9e9e9e47;
+}

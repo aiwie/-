@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <!--微信-->
+  <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.3.2.js"></script>
+  <!-- Vant -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@2.12/lib/index.css" />
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6/dist/vue.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vant@2.12/lib/vant.min.js"></script>
+  <!--axios-->
+  <script src="https://cdn.jsdelivr.net/npm/axios@0.21.4/dist/axios.min.js"></script>
+  <!--moment时间过滤-->
+  <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.js"></script>
+  <title>问题管理</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #F2F2F2;
+    }
+
+    /* 搜索框-Start */
+    .search {
+      top: 0;
+      height: 35px;
+      padding: 14px 14px 12px 15px;
+      background: #F2F2F2;
+      border-bottom: 1px solid #E2E2E2;
+    }
+
+    .search-select {
+      width: 100%;
+      height: 34px;
+      font-size: 14px;
+      color: #646A73;
+      border: 1px solid rgba(112, 112, 112, 0.2);
+      opacity: 1;
+      border-radius: 20px;
+    }
+
+    .search-select-value {
+      font-size: 10px;
+      line-height: 20px;
+    }
+
+    /* 搜索框-End */
+
+
+    /* 问题详情-Start */
+    .problemlist {
+      margin-bottom: 70px;
+    }
+
+    .problemlist-item {
+      margin: 12px 14px 10px 15px;
+      padding: 16px 20px 14px 14px;
+      font-size: 12PX;
+      background: #FFFFFF;
+      box-shadow: 0px 3px 10px rgba(17, 87, 117, 0.2);
+      border-radius: 8px;
+      border-left: 4px solid #349FF1;
+    }
+
+    .problemlist-item.complete {
+      border-left: 4px solid #07c160;
+    }
+
+    .problemlist-item.doing {
+      border-left: 4px solid #349FF1;
+    }
+
+    .problemlist-item.reject {
+      border-left: 4px solid #ee0a24;
+    }
+
+    .problemlist-item-content {
+      margin-top: 24px;
+
+    }
+
+    .form {
+      margin-top: 6px;
+    }
+
+    .formTitle {
+      font-size: 12px;
+      color: #848D99;
+    }
+
+    .formValue {
+      margin-left: 8px;
+      font-size: 12px;
+      color: #000000;
+    }
+
+    /* 问题详情-End */
+
+
+    /* 问题上传-Start*/
+    .button {
+      position: fixed;
+      width: 100%;
+      height: 60px;
+      bottom: 0;
+      background: #F2F2F2;
+      border-top: 1px solid #E2E2E2;
+    }
+
+    /* 问题上传-End */
+  </style>
+</head>
+
+<body>
+  <div id="contain">
+    <!--搜索栏-->
+    <van-sticky>
+      <div class="search">
+        <van-row type="flex" justify="space-around">
+          <!--时间选择-->
+          <van-col span="8">
+            <div class="search-select" @click="timeshow = true">
+              <div role="button" style="padding: 7px 12px 7px 12px;">
+                <van-row type="flex" justify="space-between">
+                  <div class="search-select-value">
+                    <span v-if="timevalue">{{ timevalue|datefmt("YYYY/MM/DD")}}</span>
+                    <span v-else>全部</span>
+                  </div>
+                  <i class="van-icon van-icon-arrow van-cell__right-icon"></i>
+                </van-row>
+              </div>
+            </div>
+          </van-col>
+          <!--状态选择-->
+          <van-col span="7">
+            <div class="search-select" @click="stateschoose.show = true">
+              <div role="button" style="padding: 7px 12px 7px 12px;">
+                <van-row type="flex" justify="space-between">
+                  <div class="search-select-value">
+                    <span>{{stateschoose.value==""?"状态":stateschoose.value}}</span>
+                  </div>
+                  <i class="van-icon van-icon-arrow van-cell__right-icon"></i>
+                </van-row>
+              </div>
+            </div>
+          </van-col>
+          <!--类型选择-->
+          <van-col span="7">
+            <div class="search-select" @click="typechoose.show = true">
+              <div role="button" style="padding: 7px 12px 7px 12px;">
+                <van-row type="flex" justify="space-between">
+                  <div class="search-select-value">
+                    <span>{{typechoose.value==""?"类型":typechoose.value}}</span>
+                  </div>
+                  <i class="van-icon van-icon-arrow van-cell__right-icon"></i>
+                </van-row>
+              </div>
+            </div>
+          </van-col>
+        </van-row>
+      </div>
+    </van-sticky>
+
+    <!-- 问题详情-->
+    <div class="problemlist">
+      <template v-for="(item, index) in reportData" :key="index">
+        <!--质量问题和安全问题-->
+        <template v-if="item.reportTypeCode=='quality'||item.reportTypeCode=='safety'">
+          <div class="problemlist-item" :class="item.auditStatus" @click="jumpDlist(item)">
+            <!--问题状态-->
+            <van-row type="flex" justify="space-between">
+              <van-col>
+                <h4 v-if="item.reportTypeCode=='quality'" style="font-size: 16px;">质量问题</h4>
+                <h4 v-if="item.reportTypeCode=='safety'" style="font-size: 16px;">安全问题</h4>
+              </van-col>
+              <van-col>
+                <van-tag v-if="item.auditStatus=='complete'" type="success" size="medium" round="true">完成</van-tag>
+                <van-tag v-if="item.auditStatus=='nextAudit'" type="primary" size="medium" round="true">整改中</van-tag>
+                <van-tag v-if="item.auditStatus=='reject'" type="danger" size="medium" round="true">驳回</van-tag>
+                <van-tag v-if="item.auditStatus=='submit'" type="warning" size="medium" round="true">待整改</van-tag>
+              </van-col>
+            </van-row>
+            <!--问题内容-->
+            <div class="problemlist-item-content">
+              <van-row type="flex" justify="space-between">
+                <van-col span="12" class="form">
+                  <span class="formTitle">问题程度:</span>
+                  <span class="formValue">{{item.content.data[0].value + '问题'}}</span>
+                </van-col>
+                <van-col span="12" class="form">
+                  <span class="formTitle">问题类型:</span>
+                  <span class="formValue">{{item.content.data[1].value}}</span>
+                </van-col>
+                <van-col span="12" class="form">
+                  <span class="formTitle">整&nbsp;&nbsp;改&nbsp;&nbsp;人:</span>
+                  <span class="formValue">{{item.content.data[6].userName}}</span>
+                </van-col>
+                <van-col span="12" class="form">
+                  <span class="formTitle">整改时间:</span>
+                  <span class="formValue">{{item.content.data[3].value}}</span>
+                </van-col>
+                <van-col span="12" class="form">
+                  <span class="formTitle">提&nbsp;&nbsp;交&nbsp;&nbsp;人:</span>
+                  <span class="formValue">{{item.userName}}</span>
+                </van-col>
+                <van-col span="12" class="form">
+                  <span class="formTitle">提交时间:</span>
+                  <span class="formValue">{{item.createDate|datefmt("YYYY-MM-DD")}}</span>
+                </van-col>
+              </van-row>
+            </div>
+            <!--分割线-->
+            <van-divider></van-divider>
+            <div class="form">
+              <span class="formTitle">问题描述:</span>
+              <span class="formValue">{{item.content.data[2].value}}</span>
+            </div>
+          </div>
+        </template>
+        <!--班前培训-->
+        <template v-if="item.reportTypeCode=='classtrain'">
+          <div class="problemlist-item" :class="item.auditStatus">
+            <!--问题状态-->
+            <van-row type="flex" justify="space-between">
+              <van-col>
+                <h4 v-if="item.reportTypeCode=='classtrain'" style="font-size: 16px;">班前培训</h4>
+              </van-col>
+              <van-col>
+                <van-tag v-if="item.auditStatus=='complete'" type="success" size="medium" round="true">完成</van-tag>
+                <van-tag v-if="item.auditStatus=='nextAudit'" type="primary" size="medium" round="true">整改中</van-tag>
+                <van-tag v-if="item.auditStatus=='reject'" type="danger" size="medium" round="true">驳回</van-tag>
+                <van-tag v-if="item.auditStatus=='submit'" type="warning" size="medium" round="true">待整改</van-tag>
+              </van-col>
+            </van-row>
+            <!--问题内容-->
+            <div class="problemlist-item-content">
+              <van-row type="flex" justify="space-between">
+                <van-col span="24" class="form">
+                  <span class="formTitle">培训班组:</span>
+                  <span class="formValue">{{getReportDataContent(index,"class")}}</span>
+                </van-col>
+
+                <van-col span="12" class="form">
+                  <span class="formTitle">主&nbsp;&nbsp;讲&nbsp;&nbsp;人:</span>
+                  <span class="formValue">{{getReportDataContent(index,"teacher")}}</span>
+                </van-col>
+                <van-col span="12" class="form">
+                  <span class="formTitle">培训人员:</span>
+                  <span class="formValue">{{getReportDataContent(index,"peoplecount")}}人</span>
+                </van-col>
+
+                <van-col span="24" class="form">
+                  <span class="formTitle">提交时间:</span>
+                  <span class="formValue">{{item.createDate|datefmt("YYYY.MM.DD")}}</span>
+                </van-col>
+              </van-row>
+            </div>
+            <!--分割线-->
+            <van-divider></van-divider>
+            <div class="form">
+              <span class="formTitle">培训内容:</span>
+              <span class="formValue">{{getReportDataContent(index,"content")}}</span>
+            </div>
+          </div>
+        </template>
+      </template>
+    </div>
+
+    <!--问题上传-->
+    <div class="button">
+      <van-row type="flex" justify="space-around" style="height: 100%;align-items:center;">
+        <van-col span="22">
+          <van-button type="info" block round @click="roblemReport">问题上报</van-button>
+        </van-col>
+      </van-row>
+    </div>
+
+    <!--底部弹出选项-->
+    <van-popup v-model="timeshow" position="bottom">
+      <van-datetime-picker @confirm="timeOnConfirm" v-model="timevalue" type="date" title="选择时间" cancel-button-text="重置"
+        @cancel="tiemCancelBtn">
+      </van-datetime-picker>
+    </van-popup>
+    <van-popup v-model="stateschoose.show" position="bottom">
+      <van-picker show-toolbar :columns="stateschoose.columns" title="状态" @confirm="statesOnConfirm" value-key="name"
+        cancel-button-text="重置" @cancel="statesCanceBtn" />
+    </van-popup>
+    <van-popup v-model="typechoose.show" position="bottom">
+      <van-picker show-toolbar :columns="typechoose.columns" title="问题类型" @confirm="typeOnConfirm"
+        @cancel="typechoose.show = false" value-key="name" />
+    </van-popup>
+  </div>
+</body>
+
+<script src="./js/public.js"></script>
+<script>
+  var date = new Date();
+  var time = date.toLocaleDateString().split('/').join('-');
+  window.onload = function () {
+    var isPageHide = false;
+    window.addEventListener('pageshow', function () {
+      if (isPageHide) {
+        window.location.reload()
+      }
+    })
+    window.addEventListener('pagehide', function () {
+      isPageHide = true
+    })
+  }
+  new Vue({
+    el: "#contain",
+    data: {
+      platCode: getUrlParam('platCode'),
+      corpCode: getUrlParam('corpCode'),
+      projectCode: getUrlParam('projectCode'),
+      token: getUrlParam('token'),
+      userCode: getUrlParam('userCode'),
+      userName: getUrlParam('userName'),
+      projectId: getUrlParam('projectId'),
+      mobilePhone: getUrlParam('mobilePhone'),
+      h5PageUrl: 'https://site.tieweizhixing.com/file-service/files/h5/',
+      apiUrl: 'https://site.tieweizhixing.com',
+      timeshow: false,//时间显示
+      timevalue: '',//时间值
+      stateschoose: {//审核状态
+        show: false,
+        key: '',
+        value: '',
+        columns: [
+          { key: 'complete', name: '完成' },
+          { key: 'nextAudit', name: '整改中' },
+          { key: 'reject', name: '驳回' },
+          { key: 'submit', name: '待整改' }]
+      },
+      typechoose: {//类型
+        show: false,
+        key: 'quality',
+        value: '质量问题',
+        columns: [
+          { key: 'quality', name: '质量问题' },
+          { key: 'safety', name: '安全问题' },
+          { key: 'classtrain', name: '班前培训' }]
+      },
+      reportData: [],//上报数据
+      qualitytypeList: [],
+      safetytypeList: [],
+    },
+    created() {
+
+    },
+    mounted() {
+      this.getReportData()
+    },
+    methods: {
+
+      roblemReport() { // 问题上报跳转
+        let severUrl = "http://127.0.0.1:5500/" // 测试数据
+        let strUrl = "reportCategory.html"
+        let roblemReportHtml = strUrl + '?platCode=' + this.platCode + '&projectCode=' + this.projectCode + '&token=' + this.token + '&corpCode=' + this.corpCode + '&userCode=' + this.userCode + '&userName=' + this.userName + '&projectId=' + this.projectId + '&mobilePhone=' + this.mobilePhone
+        window.location.href = roblemReportHtml
+      },
+      jumpDlist(val) {  // 详情跳转
+        console.log(val)
+        let requestCode = val.requestCode
+        if (!requestCode) {
+          this.$toast({
+            message: '测试数据不能查看详情',
+            position: 'top',
+          });
+          return false
+        }
+        let strUrl = "qualityProblemDetails.html"
+        let roblemReportHtml = strUrl + '?platCode=' + this.platCode + '&projectCode=' + this.projectCode + '&token=' + this.token + '&corpCode=' + this.corpCode + '&userCode=' + this.userCode + '&userName=' + this.userName + '&projectId=' + this.projectId + '&requestCode=' + val.requestCode
+        window.location.href = roblemReportHtml
+      },
+      timeOnConfirm(date) {
+        this.timeshow = false;
+        this.timevalue = date;
+        this.getReportData();
+      },
+      statesOnConfirm(date) {
+        this.stateschoose.value = date.name;
+        this.stateschoose.key = date.key;
+        this.stateschoose.show = false;
+        this.getReportData();
+      },
+      typeOnConfirm(date) {
+        this.typechoose.value = date.name;
+        this.typechoose.key = date.key;
+        this.typechoose.show = false;
+        this.getReportData();
+      },
+      tiemCancelBtn() { // 时间取消按钮
+        this.timevalue = ''
+        this.timeshow = false;
+        this.getReportData();
+      },
+      statesCanceBtn() { // 状态取消按钮
+        this.stateschoose.key = ''
+        this.stateschoose.value = '状态'
+        this.stateschoose.show = false
+        this.getReportData();
+      },
+      getReportData(val) {//上报数据查询
+        var that = this;
+        var params = {
+          platCode: that.platCode,
+          corpCode: that.corpCode,
+          projectCode: that.projectCode,
+          userCode: that.userCode,
+          reportDateStart: that.timevalue,
+          reportDateEnd: that.timevalue
+        };
+        if (that.typechoose.key) {
+          params["reportTypeCode"] = that.typechoose.key;
+        }
+        if (that.stateschoose.key) {
+          params["auditStatus"] = that.stateschoose.key;
+        }
+
+        axios.post(that.apiUrl + "/projectservice/report/20/getReportData", params)
+          .then(res => {
+            if (res.data.code == '1') {
+              that.reportData = res.data.data.list;
+            }
+          }).catch(err => {
+            console.error(err);
+          })
+      },
+      getReportDataContent(index, contentkey) {
+        var that = this;
+        var data = that.reportData[index].content.data;
+        var object = data.filter(x => x.key === contentkey);
+        if (object.length == 1) {
+          if (contentkey == "reformuser") {
+            return object[0].userName;
+          }
+          else {
+            return object[0].value;
+          }
+        }
+        else {
+          return '';
+        }
+      },
+
+    },
+    filters: {
+      datefmt(date, format) {
+        if (date != '') {
+          return this.moment(date, 'YYYY-MM-DD').format(format);
+        } else {
+          return "";
+        }
+      }
+    }
+  });
+</script>
+
+
+</html>

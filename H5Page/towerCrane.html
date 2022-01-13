@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <!--jquery-->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <!--微信-->
+    <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.3.2.js"></script>
+    <!-- Vant -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@2.12/lib/index.css" />
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6/dist/vue.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vant@2.12/lib/vant.min.js"></script>
+    <!--阿里巴巴图标-->
+    <link rel="stylesheet" href="js/iconfont/iconfont.css" />
+    <!--axios-->
+    <script src="https://cdn.jsdelivr.net/npm/axios@0.21.4/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.js"></script>
+    <!--moment时间过滤-->
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.js"></script>
+    <script src="./js/public.js"></script>
+    <title>塔吊监控</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #F2F2F2;
+        }
+
+        /* rem兼容解决-Start*/
+        /*
+            **使用时有可能造成div等容器过大。
+            **div中放入img时，让div的宽高自适应，此时会造成容器的宽高可能会大于img的宽高.
+            **解决：容器添加  font-size:0 ,然后div中的内容使用rem
+        */
+        div {
+            font-size: 0;
+        }
+
+        div img {
+            width: 1rem;
+        }
+
+        div p {
+            font-size: 0.5rem;
+        }
+
+        .van-cell__title {
+            font-size: .28rem;
+        }
+
+        .van-cell__value {
+            font-size: .28rem;
+        }
+
+        .van-ellipsis {
+            font-size: .36rem;
+        }
+
+        /* rem兼容解决-Start*/
+
+
+
+        /*今日预警-Start*/
+        .todaywarning {
+            margin: 12px 14px 0 15px;
+            padding: 1px;
+            padding-bottom: 18px;
+            background: #FFFFFF;
+            opacity: 1;
+            border-radius: 8px;
+        }
+
+        .warning-title {
+            margin-top: .32rem;
+            font-size: .32rem;
+            text-align: center;
+            font-weight: bold;
+            color: #222E6A;
+        }
+
+        .warning-box {
+            margin-top: 18px;
+        }
+
+        .warning-icon {
+            position: relative;
+            margin-left: .24rem;
+            margin-right: .32rem;
+            width: .88rem;
+            height: .88rem;
+            text-align: center;
+            background: #D6DFFF;
+            border-radius: 60px;
+        }
+
+        .warning-icon i {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            font-size: .52rem;
+            color: #697efc;
+        }
+
+        .warning-content-item-box {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .warning-content-item-box:nth-child(2) {
+            padding-top: .12rem;
+        }
+
+        .warning-content-item-box span {
+            font-size: .24rem;
+            color: #222E6A;
+        }
+
+        .dianjitiaozhuan {
+            flex-grow: 1;
+            position: relative;
+            text-align: center;
+        }
+
+        .dianjitiaozhuan i {
+            position: absolute;
+            top: 45%;
+            transform: translate(-50%, -50%);
+            font-size: .48rem;
+            color: #222E6A;
+            opacity: 0.6;
+        }
+
+        /*今日预警-End*/
+
+        /*今日天气-Start*/
+        .weather {
+            margin: 12px 14px 0 15px;
+            padding: 20px 9px 23px 11px;
+            color: #FFFFFF;
+            background: url(image/weather-image.png);
+            background-repeat: no-repeat;
+            background-size: 100% 100%;
+            background-size: cover;
+            border-radius: 8px;
+        }
+
+        .weather .van-divider {
+            margin: 10px 0;
+        }
+
+        .realtime-weather {
+            width: 100%;
+            white-space: nowrap;
+            overflow-y: auto;
+            /*可滑动*/
+        }
+
+        .realtime-weather::-webkit-scrollbar {
+            display: none;
+        }
+
+        .realtime-weather-item {
+            width: 1rem;
+            display: inline-block;
+            /*行内块元素*/
+            text-align: center;
+            line-height: .4rem;
+        }
+
+        .realtime-weather-item p {
+            font-size: .24rem;
+            color: seashell;
+        }
+
+        .realtime-weather-item i {
+            font-size: .36rem;
+        }
+
+        /*今日天气-End*/
+
+        /*Tab标签页-Start*/
+        .tabs {
+            margin-top: 12px;
+
+        }
+
+        .van-tab {
+            border-bottom: 1px solid #E2E2E2;
+        }
+
+        .van-tab__text {
+            font-weight: bold;
+        }
+
+        .van-tab:first-child {
+            position: relative;
+        }
+
+        .van-tab:first-child:after {
+            content: ' ';
+            position: absolute;
+            height: 80%;
+            right: 0;
+            border-right: 1px solid #E2E2E2;
+        }
+
+        .van-tabs__line {
+            background-color: #2040FF;
+        }
+
+        .van-tabs__content {
+            background: #FFFFFF;
+        }
+
+        /*Tab标签页-End*/
+
+
+        /*设备监控-Start*/
+        .equipment {
+            padding: 14px 15px 12px 15px;
+        }
+
+        .equipment-item {
+            margin-bottom: 12px;
+            padding: 12px 12px 20px 12px;
+            background: #FFFFFF;
+            box-shadow: 0px 3px 6px rgba(54, 57, 254, 0.11);
+            border-radius: 4px;
+        }
+
+        .equipment-icon {
+            position: relative;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(317deg, #1717FF 0%, #9EABFC 100%);
+            opacity: 1;
+            border-radius: 8px;
+        }
+
+        .equipment-icon.offline {
+            background: #C5C8D2;
+        }
+
+        .equipment-icon i {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            font-size: .26rem;
+            color: #FFFFFF;
+            opacity: 0.6;
+
+        }
+
+        .equipment-name {
+            font-size: .28rem;
+            font-weight: bold;
+        }
+
+        .equipment-position {
+            flex-grow: 1;
+            text-align: right;
+            font-size: .28rem;
+            font-weight: bold;
+        }
+
+        .equipment-detailed {
+            margin-top: 14px;
+        }
+
+        .equipment-detailed div {
+            padding: 12px 0 11px 0;
+            width: 33%;
+            line-height: 18px;
+            text-align: center;
+            background: #ECF5FF;
+            opacity: 1;
+            border-radius: 4px;
+        }
+
+        .equipment-detailed.offline div {
+            background: #E2E2E2;
+        }
+
+        .equipment-staff-title {
+            position: relative;
+            margin-top: 25px;
+            padding-left: 10px;
+            font-size: .28rem;
+        }
+
+        .equipment-staff-title:before {
+            content: " ";
+            position: absolute;
+            top: 1px;
+            left: 0;
+            bottom: 1px;
+            border-left: 3px solid #2040FF;
+            border-radius: 4px;
+        }
+
+        .equipment-staff-title.offline:before {
+            border-left: 3px solid #C5C8D2;
+        }
+
+        .staff-card {
+            margin-top: 12px;
+        }
+
+        .staff-img {
+            height: 100%;
+            margin-right: 20px;
+        }
+
+        .staff-team {
+            flex-grow: 1;
+            line-height: 16px;
+        }
+
+        .staff-team span {
+            font-size: .24rem;
+        }
+
+        /*设备监控-End*/
+
+
+        /*旋转监控-Start*/
+        .rotating {
+            padding: 14px 15px 12px 15px;
+        }
+
+        .rotating-item {
+            margin-top: 12px;
+            padding-top: 12px;
+            padding-bottom: 15px;
+
+            background: #F1FFF2;
+            border-radius: 8px;
+        }
+
+        .rotating-item.stop {
+            background: #ECF5FF;
+        }
+
+        .rotating-staff-title {
+            position: relative;
+            margin-left: 26px;
+            font-size: .28rem;
+            color: #4CB75A;
+        }
+
+        .rotating-staff-title::before {
+            content: " ";
+            position: absolute;
+            top: 40%;
+            left: -15px;
+            width: 8px;
+            height: 8px;
+            border-radius: 20px;
+            border: 1px solid #4CB75A;
+            background-color: #4CB75A;
+        }
+
+        .rotating-staff-title.stop {
+            color: #2040FF;
+        }
+
+        .rotating-staff-title.stop::before {
+            content: " ";
+            position: absolute;
+            top: 40%;
+            left: -15px;
+            width: 8px;
+            height: 8px;
+            border-radius: 20px;
+            border: 1px solid #2040FF;
+            background-color: #2040FF;
+        }
+
+        /*旋转监控-End*/
+    </style>
+</head>
+
+<body>
+    <div id="contain">
+        <!--时间选择-->
+        <van-sticky>
+            <van-sticky>
+                <van-row type="flex" justify="space-between">
+                    <van-cell title="选择日期" is-link :value="timevalue|datefmt" @click="timeshow = true"></van-cell>
+
+                    <van-popup v-model="timeshow" position="bottom">
+                        <van-datetime-picker @confirm="timeOnConfirm" v-model="timevalue" type="date">
+                        </van-datetime-picker>
+                    </van-popup>
+
+                </van-row>
+            </van-sticky>
+        </van-sticky>
+
+        <!--今日预警-->
+        <div class="todaywarning">
+            <div class="warning-title">
+                <span>今日预警</span>
+            </div>
+            <!-- 预警内容 -->
+            <van-row type="flex" class="warning-box">
+                <van-col class="warning-icon">
+                    <i class="iconfont icon-tixing"></i>
+                </van-col>
+                <van-col span="16" class="warning-content-item">
+                    <div class="warning-content-item-box">
+                        <span>未佩戴安全帽预警</span>
+                        <span>30分钟前</span>
+                    </div>
+                    <div class="warning-content-item-box">
+                        <span>PM2.5气体监测异常</span>
+                        <span>30分钟前</span>
+                    </div>
+                </van-col>
+                <van-col class="dianjitiaozhuan">
+                    <i class="iconfont icon-dianjitiaozhuan"></i>
+                </van-col>
+            </van-row>
+        </div>
+
+        <!--今日天气-->
+        <div class="weather">
+            <van-row type="flex" justify="space-between">
+                <van-col>
+                    <p style="font-size: .28rem;">{{weather.city}}</p>
+                    <p style="font-size: .4rem;">{{weather.temperature}}℃</p>
+                </van-col>
+                <van-col style="text-align: right;">
+                    <p style="font-size: .24rem;">{{weather.weather}}</p>
+                    <p style="font-size: .28rem;">32℃~25℃</p>
+                </van-col>
+            </van-row>
+            <van-divider :style="{ color: '#F2F2F2', borderColor: '#F2F2F2'}"></van-divider>
+            <div class="realtime-weather">
+                <template v-for="(item,index) in 24">
+                    <div class="realtime-weather-item">
+                        <p>{{item}}时</p>
+                        <i class="iconfont icon-tq_01qing"></i>
+                        <p>31℃</p>
+                    </div>
+                </template>
+
+            </div>
+        </div>
+
+        <!--Tab标签页-->
+        <van-tabs :active="active" bind:change="onChange" class="tabs" title-active-color="#2040FF">
+            <!--设备监控-->
+            <van-tab title="设备监控" class="equipment">
+                <template v-for="(item,index) in 2">
+                    <!--在线-->
+                    <div class="equipment-item" v-if="item==1">
+                        <van-row type="flex">
+                            <van-col span="2">
+                                <div class="equipment-icon">
+                                    <i class="iconfont icon-tadiao1"></i>
+                                </div>
+                            </van-col>
+                            <van-col class="equipment-name">
+                                <span>塔吊监控1#</span>
+                            </van-col>
+                            <van-col class="equipment-position">
+                                <span>1#楼分组</span>
+                            </van-col>
+                        </van-row>
+                        <van-row type="flex" justify="space-between" class="equipment-detailed">
+                            <van-col>
+                                <p style="font-size: .24rem;color: #646A73;">今日吊次</p>
+                                <p style="font-size: .20rem;color: #222E6A;">5次</p>
+                            </van-col>
+                            <van-col>
+                                <p style="font-size: .24rem;color: #646A73;">今日预警</p>
+                                <p style="font-size: .20rem;color: #FF0000;">3次</p>
+                            </van-col>
+                            <van-col>
+                                <p style="font-size: .24rem;color: #646A73;">当前状态</p>
+                                <p style="font-size: .32rem;color: #4CB75A;">在线</p>
+                            </van-col>
+                        </van-row>
+                        <div class="equipment-staff-title">
+                            <span>驾驶员信息</span>
+                        </div>
+                        <div class="staff-card">
+                            <van-row type="flex" justify="between">
+                                <van-col span="5" class="staff-img">
+                                    <van-image src="image/员工.png" />
+                                </van-col>
+                                <van-col class="staff-team">
+                                    <p>
+                                        <span style="color: #848D99;">驾 驶 员：</span><span>张三</span>
+                                    </p>
+                                    <p>
+                                        <span style="color: #848D99;">联系方式：</span><span>13012546352</span>
+                                    </p>
+                                    <p>
+                                        <span style="color: #848D99;">所属班组：</span><span>机械班组</span>
+                                    </p>
+                                    <p>
+                                        <span style="color: #848D99;">开始时间：</span><span>2021-08-17 14:31</span>
+                                    </p>
+                                </van-col>
+                            </van-row>
+                        </div>
+                    </div> 
+                    <!--离线-->
+                    <div class="equipment-item" v-if="item==2">
+                        <van-row type="flex">
+                            <van-col span="2">
+                                <div class="equipment-icon offline">
+                                    <i class="iconfont icon-tadiao1"></i>
+                                </div>
+                            </van-col>
+                            <van-col class="equipment-name">
+                                <span style="color: #646A73;">塔吊监控1#</span>
+                            </van-col>
+                            <van-col class="equipment-position">
+                                <span style="color: #646A73;">1#楼分组</span>
+                            </van-col>
+                        </van-row>
+                        <van-row type="flex" justify="space-between" class="equipment-detailed offline">
+                            <van-col>
+                                <p style="font-size: .24rem;color: #646A73;">今日吊次</p>
+                                <p style="font-size: .20rem;color: #222E6A;">5次</p>
+                            </van-col>
+                            <van-col>
+                                <p style="font-size: .24rem;color: #646A73;">今日预警</p>
+                                <p style="font-size: .20rem;color: #FF0000;">3次</p>
+                            </van-col>
+                            <van-col>
+                                <p style="font-size: .24rem;color: #646A73;">当前状态</p>
+                                <p style="font-size: .32rem;color: #646A73;">离线</p>
+                            </van-col>
+                        </van-row>
+                        <div class="equipment-staff-title offline">
+                            <span style="color: #646A73;">驾驶员信息</span>
+                        </div>
+                        <div class="staff-card" style="text-align: center; line-height: 30px;">
+                            <span style="font-size: .24rem;color: #848D99;">
+                                当前状态已离线，没有信息可显示
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- <div class="equipment-item">
+                        <van-row type="flex">
+                            <van-col span="2">
+                                <div class="equipment-icon">
+                                    <i class="iconfont icon-tadiao1"></i>
+                                </div>
+                            </van-col>
+                            <van-col class="equipment-name">
+                                <span>{{item.name}}#</span>
+                            </van-col>
+                            <van-col class="equipment-position">
+                                <span>1#楼分组</span>
+                            </van-col>
+                        </van-row>
+                        <van-row type="flex" justify="space-between" class="equipment-detailed">
+                            <van-col>
+                                <p style="font-size: .24rem;color: #646A73;">今日吊次</p>
+                                <p style="font-size: .20rem;color: #222E6A;">5次</p>
+                            </van-col>
+                            <van-col>
+                                <p style="font-size: .24rem;color: #646A73;">今日预警</p>
+                                <p style="font-size: .20rem;color: #FF0000;">3次</p>
+                            </van-col>
+                            <van-col>
+                                <p style="font-size: .24rem;color: #646A73;">当前状态</p>
+                                <p style="font-size: .32rem;color: #4CB75A;">在线</p>
+                            </van-col>
+                        </van-row>
+                        <div class="equipment-staff-title">
+                            <span>驾驶员信息</span>
+                        </div>
+                        <div class="staff-card">
+                            <van-row type="flex" justify="between">
+                                <van-col span="5" class="staff-img">
+                                    <van-image src="image/员工.png" />
+                                </van-col>
+                                <van-col class="staff-team">
+                                    <p>
+                                        <span style="color: #848D99;">驾&nbsp;&nbsp;驶&nbsp;&nbsp;员：</span><span>{{item.datas.driver}}</span>
+                                    </p>
+                                    <p>
+                                        <span style="color: #848D99;">联系方式：</span><span>{{item.datas.mobilephone}}</span>
+                                    </p>
+                                    <p>
+                                        <span style="color: #848D99;">所属班组：</span><span>机械班组</span>
+                                    </p>
+                                    <p>
+                                        <span style="color: #848D99;">开始时间：</span><span>2021-08-17 14:31</span>
+                                    </p>
+                                </van-col>
+                            </van-row>
+                        </div>
+                    </div> -->
+
+                </template>
+            </van-tab>
+            <!--旋转监控-->
+            <van-tab title="旋转监控" class="rotating">
+                <h5 style=" font-size: .28rem;color: #222E6A;">吊塔检测</h5>
+                <template v-for="(item,index) in 2">
+                    <!--正常-->
+                    <div class="rotating-item" v-if="item==1">
+                        <div class="rotating-staff-title">
+                            <span>1#楼塔吊</span>
+                        </div>
+                        <van-row type="flex" justify="space-between" style="margin-top: 18px;text-align: center;line-height: 20px;">
+                            <van-col span="6">
+                                <p style="font-size: .24rem; color: #9BA6B4;">当前状态</p>
+                                <p style="font-size: .24rem; color: #646A73;">正常</p>
+                            </van-col>
+                            <van-col span="6">
+                                <p style="font-size: .24rem; color: #9BA6B4;">当前角度</p>
+                                <p style="font-size: .24rem; color: #646A73;">43°</p>
+                            </van-col>
+                            <van-col span="6">
+                                <p style="font-size: .24rem; color: #9BA6B4;">当前状态</p>
+                                <p style="font-size: .24rem; color: #646A73;">1T</p>
+                            </van-col>
+                            <van-col span="6">
+                                <p style="font-size: .24rem; color: #9BA6B4;">臂长</p>
+                                <p style="font-size: .24rem; color: #646A73;">50m</p>
+                            </van-col>
+                        </van-row>
+                    </div>
+                    <!--停止-->
+                    <div class="rotating-item stop" v-if="item==2">
+                        <div class="rotating-staff-title stop">
+                            <span>2#楼塔吊</span>
+                        </div>
+                        <van-row type="flex" justify="space-between" style="margin-top: 18px;text-align: center;line-height: 20px;">
+                            <van-col span="6">
+                                <p style="font-size: .24rem; color: #9BA6B4;">当前状态</p>
+                                <p style="font-size: .24rem; color: #646A73;">停止</p>
+                            </van-col>
+                            <van-col span="6">
+                                <p style="font-size: .24rem; color: #9BA6B4;">当前角度</p>
+                                <p style="font-size: .24rem; color: #646A73;">43°</p>
+                            </van-col>
+                            <van-col span="6">
+                                <p style="font-size: .24rem; color: #9BA6B4;">当前状态</p>
+                                <p style="font-size: .24rem; color: #646A73;">1T</p>
+                            </van-col>
+                            <van-col span="6">
+                                <p style="font-size: .24rem; color: #9BA6B4;">臂长</p>
+                                <p style="font-size: .24rem; color: #646A73;">50m</p>
+                            </van-col>
+                        </van-row>
+
+                    </div>
+                </template>
+            </van-tab>
+        </van-tabs>
+
+    </div>
+</body>
+
+</html>
+
+
+<script>
+    var vm = new Vue({
+        el: "#contain",
+        data: {
+            apiUrl: 'https://site.tieweizhixing.com/',
+            active: 0,//Tab页切换
+            alarmMessage: [],//今日预警信息
+            timevalue: new Date(), //筛选时间
+            timeshow: false,//显示时间选择
+            weather: [], //当前位置天气信息
+            statGeneralTowercrane: [],//吊塔统计数据
+            platCode: '',
+            projectCode: "",
+            token:'',
+        },
+        created() {
+
+            (function (win, doc) {
+                //rem兼容
+                if (!win.addEventListener) return;
+                var html = document.documentElement;
+                function setFont() {
+                    var cliWidth = html.clientWidth;
+                    if (cliWidth > 750) {
+                        cliWidth = 750;
+                    }
+                    html.style.fontSize = 100 * (cliWidth / 750) + "px";
+                }
+                win.addEventListener("resize", setFont, false);
+                doc.addEventListener("DOMContentLoaded", setFont, false);
+            })(window, document);
+
+
+            this.platCode = getUrlParam('platCode')
+            this.projectCode = getUrlParam('projectCode')
+            this.token = getUrlParam('token')
+        },
+        mounted() {
+            this.getAlarmMessageByProject();
+            this.getWeather();
+            this.getStatGeneralTowercrane();
+        },
+        methods: {
+            timeOnConfirm(date) {
+                this.timeshow = false;
+                this.timevalue = date;
+            },
+            getAlarmMessageByProject() {//获取今日预警
+                var that = this;
+                var params = {
+                    // "projectCode": "YDDSY_20211008132951486",
+                    "projectCode": this.projectCode,
+                    // "platCode": "ibuildSite",
+                    "platCode": this.platCode,
+                    "msgType": "alarm",
+                    "beginTime": timeFn(),
+                    "endTime": timeFn(),
+                    "level": "level1"
+                };
+                axios.post(that.apiUrl + "/oaservice/message/20/getAlarmMessageByProject", params)
+                    .then(res => {
+                        if (res.data.code == '1') {
+                            that.alarmMessage = res.data.data.list;
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                    })
+            },
+            getWeather() { //获取当前位置天气信息
+                //获取实时天气
+                axios.get(
+                    'https://restapi.amap.com/v3/weather/weatherInfo?key=b90e3d5af527c52e8d2010fe27fc3565&city=420100'
+                )
+                    .then(res => {
+                        if (res.data.infocode == "10000") {
+                            this.weather = res.data.lives[0]
+                        }
+                        console.log(res)
+                    })
+                    .catch(err => {
+                        console.error(err);
+                    })
+            },
+            getStatGeneralTowercrane() {//获取塔吊统计
+                var that = this;
+                var params = {
+                    token: this.token,
+                    // projectCode: "hsxm001"
+                    projectCode: this.projectCode
+                };
+                axios.post(that.apiUrl + "/projectservice/toweranalysis/20/getStatGeneralTowercrane", params)
+                    .then(res => {
+                        if (res.data.code == '1') {
+                            that.statGeneralTowercrane = res.data.data.list;
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                    })
+            },
+        },
+        filters: {
+            datefmt(date) {
+                if (date) {
+                    return this.moment(date).format('YYYY/MM/DD');
+                } else {
+                    return "";
+                }
+            }
+        }
+
+    });
+</script>

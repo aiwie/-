@@ -1,0 +1,106 @@
+<!--pages/projectdetails/projectdetails.wxml-->
+<wxs src="../../utils/filter.wxs" module="filter"></wxs>
+<view class="page">
+    <!--项目信息-->
+    <view class="top">
+        <view style="border-bottom: 1px solid rgba(112, 112, 112, .2);">
+            <view class="top-name">
+                <text class="iconfont icon-qiye top-icon" />
+                <text>{{projectDetail.projectName}}项目</text>
+            </view>
+        </view>
+        <view class="panel__hd">
+            <text>项目信息</text>
+        </view>
+        <view class="panel_box">
+            <view class="list">
+                <view class="list-formTitle">
+                    <text>项目名称</text>
+                </view>
+                <view class="list-formValue">
+                    <text>{{projectDetail.projectName}}</text>
+                </view>
+            </view>
+            <view class="list">
+                <view class="list-formTitle">
+                    <text>开工日期</text>
+                </view>
+                <view class="list-formValue">
+                    <text>{{projectDetail.createDate}}</text>
+                </view>
+            </view>
+            <view class="list">
+                <view class="list-formTitle">
+                    <text>项目地址</text>
+                </view>
+                <view class="list-formValue">
+                    <text>{{projectDetail.address}}</text>
+                </view>
+            </view>
+            <view class="list">
+                <view class="list-formTitle">
+                    <text>联系人</text>
+                </view>
+                <view class="list-formValue">
+                    <text>{{projectDetail.contactName}}</text>
+                </view>
+            </view>
+            <view class="list">
+                <view class="list-formTitle">
+                    <text>联系电话</text>
+                </view>
+                <view class="list-formValue">
+                    <text>{{projectDetail.contactMobile}}</text>
+                </view>
+            </view>
+        </view>
+    </view>
+
+    <!--项目授权信息-->
+    <view class="content">
+        <view class="content-title">
+            <text>项目授权</text>
+        </view>
+        <view class="authorization">
+            <block wx:for="{{projectDetail.permissionList}}" wx:key="permission" wx:for-item="permission">
+                <view class="authorization-list">
+                    <text>{{permission.moduleName}}</text>
+                </view>
+            </block>
+        </view>
+    </view>
+
+    <!--已接入设备数量-->
+    <view class="footer">
+        <view class="footer-title">
+            <text>已接入授权数量</text>
+        </view>
+        <view class="weui-flex weui-flex_wrap">
+            <block wx:for="{{faciStat}}" wx:key="index" wx:for-item="item">
+                <view class="weui-flex__item weui-flex__item_flex">
+                    <view class="footer-list">
+                        <view class="weui-flex">
+                            <view class="weui-flex_wrap">
+                                <view class="footer-count">
+                                    <text>{{item.count}}</text>
+                                </view>
+                                <view class="footer-name">
+                                    <text>{{filter.deviceDict(item.faciCategory)}}</text>
+                                </view>
+                            </view>
+                            <text wx:if="{{item.faciCategory=='monitor'}}" class="iconfont icon-shexiangtou footer-icon" />
+                            <text wx:if="{{item.faciCategory=='towercrane'}}" class="iconfont icon-tadiao footer-icon" />
+                            <text wx:if="{{item.faciCategory=='elevator'}}" class="iconfont icon-shengjiangji footer-icon" />
+                            <text wx:if="{{item.faciCategory=='dischargplat'}}" class="iconfont icon-xieliaopingtai footer-icon" />
+                            <text wx:if="{{item.faciCategory=='truckclean'}}" class="iconfont icon-qingxi footer-icon" />
+                            <text wx:if="{{item.faciCategory=='envi'}}" class="iconfont icon-huanjingjiance footer-icon" />
+                            <text wx:if="{{item.faciCategory=='spray'}}" class="iconfont icon-jiangchenpenlin footer-icon" />
+                            <text wx:if="{{item.faciCategory=='car'}}" class="iconfont icon-chezha footer-icon" />
+                            <text wx:if="{{item.faciCategory=='facedoor'}}" class="iconfont icon-menjin footer-icon" />
+                        </view>
+                    </view>
+                </view>
+            </block>
+        </view>
+    </view>
+</view>

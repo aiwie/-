@@ -1,0 +1,148 @@
+<!-- 首页 -->
+<custom-navbar title="{{title}}" homePath="/pages/mycompanyproject/mycompanyproject"></custom-navbar>
+
+<view class="page">
+  <!-- 头部 -->
+  <view class="top">
+    <image class="top-img" src="/images/index_top.png"></image>
+    <view class="weui-flex">
+      <view class="weui-flex__item top-border">
+        <view class="weui-flex">
+          <view class="weui-flex__item" catchtap="projectDetails">
+            <view class="top-list-title ">
+              <text>项目</text>
+            </view>
+            <view class="top-list-count" style="color:#027ac5;">
+              <text>{{statGeneral.projectBuilding}}</text>
+            </view>
+            <view class="top-list-new">
+              <text>本月</text>
+              <text style="color:#027ac5;">+ {{statGeneral.projectThisMonth}}</text>
+            </view>
+          </view>
+          <view class="weui-flex__item" catchtap="equipsDetails">
+            <view class="top-list-title">
+              <text>设备</text>
+            </view>
+            <view class="top-list-count border-right" style="color:#3bb4c2;">
+              <text>{{statGeneral.faciTotal}}</text>
+            </view>
+            <view class="top-list-new">
+              <text>本月</text><text style="color:#3bb4c2;">+{{statGeneral.faciThisMonth}}</text>
+            </view>
+          </view>
+          <view class="weui-flex__item" catchtap="clientDetails">
+            <view class="top-list-title">
+              <text>子公司</text>
+            </view>
+            <view class="top-list-count" style="color:#3f949e;">
+              <text>{{statGeneral.customerTotal}}</text>
+            </view>
+            <view class="top-list-new">
+              <text>本月</text><text style="color:#3f949e;">+{{statGeneral.customerThisMonth}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 内容-->
+  <view class="content">
+    <!--Tab道航-->
+    <view class='weui-flex'>
+      <view class='order-tab{{ statusType.currentTab == index ?"-active" :"" }} weui-flex__item '
+        wx:for="{{statusType.data}}" wx:key="index" data-index='{{index}}' bindtap="swichNav">
+        <text>{{item.name}}</text>
+        <hr />
+      </view>
+    </view>
+
+    <!--待办-->
+    <block wx:if="{{statusType.currentTab==0}}">
+      <view class="swiper-list" wx:for="{{myWork}}" wx:key="index" wx:for-item="item">
+        <view class="weui-flex">
+          <view class="weui-flex__item swiper-list-title-left list-hidden">
+            <text>{{item.examineName}}</text>
+          </view>
+          <view class=" swiper-list-title-right">
+            <text class="iconfont icon-shijian title-info-icon" />
+            <text>{{item.createDate}}</text>
+          </view>
+        </view>
+        <view class="swiper-list-content twolist-hidden">
+          <text>{{item.examineChangeType}}</text>
+        </view>
+        <view class="weui-flex swiper-list-approver">
+          <view class="weui-flex__item">
+            <text>[提交人]: {{item.approver}}</text>
+          </view>
+          <view class="btn btn-primary" data-customercode="{{item.customerCode}}" data-type="{{item.examineChangeType}}" data-item="{{item}}"
+            catchtap="approvalPage">
+            <text decode="true">详情&nbsp;</text>
+            <text class="iconfont icon-dianjitiaozhuan" />
+          </view>
+        </view>
+      </view>
+    </block>
+
+    <!--已办-->
+    <block wx:if="{{statusType.currentTab==1}}">
+      <view class="swiper-list" data-customercode="{{item.customerCode}}" wx:for="{{myWork}}" wx:key="index"
+        wx:for-item="item" catchtap="approvalPage" data-type="{{item.type}}">
+        <view class="weui-flex">
+          <view class="weui-flex__item swiper-list-title-left list-hidden">
+            <text>{{item.examineName}}</text>
+          </view>
+          <view class=" swiper-list-title-right">
+            <text class="iconfont icon-shijian title-info-icon" />
+            <text>{{item.createDate}}</text>
+          </view>
+        </view>
+        <view class="swiper-list-content twolist-hidden">
+          <text>{{item.examineChangeType}}</text>
+        </view>
+        <view class="swiper-list-approver">
+          <text>[提交人]: </text><text>{{item.approver}}</text>
+        </view>
+        <view class="swiper-list-approver">
+          <text>审批时间：</text>
+          <text>{{item.createDate}}</text>
+        </view>
+      </view>
+    </block>
+
+    <!--我发起-->
+    <block wx:if="{{statusType.currentTab==2}}">
+      <view class="swiper-list" data-customercode="{{item.customerCode}}" wx:for="{{myWork}}" wx:key="index"
+        wx:for-item="item" catchtap="approvalPage" data-type="{{item.type}}">
+        <view class="weui-flex">
+          <view class="weui-flex__item swiper-list-title-left list-hidden">
+            <text class="label label-success" style="vertical-align:4rpx;">已通过</text>
+            <text wx:if="{{item.pass=='no'}}" class="label label-error" style="vertical-align:4rpx;">未通过</text>
+            <text wx:if="{{item.pass=='waiting'}}" class="label label-warning" style="vertical-align:4rpx;">待审批</text>
+            <text style="margin-left: 6rpx;">{{item.examineName}}</text>
+          </view>
+          <view class=" swiper-list-title-right">
+            <text class="iconfont icon-shijian title-info-icon" />
+            <text>{{item.createDate}}</text>
+          </view>
+        </view>
+        <view class="swiper-list-content">
+          <text>{{item.content}}</text>
+        </view>
+        <view class="swiper-list-approver">
+          <text>[提交人]: </text>
+          <text>{{item.approver}}</text>
+        </view>
+        <view class="swiper-list-approver">
+          <text>审批时间：</text>
+          <text>{{item.createDate}}</text>
+        </view>
+      </view>
+    </block>
+
+  </view>
+</view>
+
+<view class="tab-slot"></view>

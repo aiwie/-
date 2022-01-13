@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <!--jquery-->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <!--微信-->
+    <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.3.2.js"></script>
+    <!-- Vant -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@2.12/lib/index.css" />
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6/dist/vue.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vant@2.12/lib/vant.min.js"></script>
+    <!--阿里巴巴图标-->
+    <link rel="stylesheet" href="js/iconfont/iconfont.css" />
+    <!--axios-->
+    <script src="https://cdn.jsdelivr.net/npm/axios@0.21.4/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.js"></script>
+    <!--moment时间过滤-->
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.js"></script>
+    <title>未清洗平台监测详情</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #F2F2F2;
+        }
+
+        /* rem兼容解决-Start*/
+        /*
+            **使用时有可能造成div等容器过大。
+            **div中放入img时，让div的宽高自适应，此时会造成容器的宽高可能会大于img的宽高.
+            **解决：容器添加  font-size:0 ,然后div中的内容使用rem
+        */
+        div {
+            font-size: 0;
+        }
+
+        div img {
+            width: 1rem;
+        }
+
+        div p {
+            font-size: 0.5rem;
+        }
+
+        .van-cell__title {
+            font-size: .28rem;
+        }
+
+        .van-cell__value {
+            font-size: .28rem;
+        }
+
+        .van-ellipsis {
+            font-size: .36rem;
+        }
+
+        /* rem兼容解决-Start*/
+
+
+
+        /*预警通知-Start*/
+        .todaywarning {
+            margin: 12px 14px 0 15px;
+            padding: 1px;
+            padding-bottom: 18px;
+            background: #FFFFFF;
+            opacity: 1;
+            border-radius: 8px;
+        }
+
+        .warning-title {
+            margin-top: .32rem;
+            font-size: .32rem;
+            text-align: center;
+            font-weight: bold;
+            color: #222E6A;
+        }
+
+        .warning-box {
+            margin-top: 18px;
+        }
+
+        .warning-icon {
+            position: relative;
+            margin-left: .24rem;
+            margin-right: .32rem;
+            width: .88rem;
+            height: .88rem;
+            text-align: center;
+            background: #D6DFFF;
+            border-radius: 60px;
+        }
+
+        .warning-icon i {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            font-size: .52rem;
+            color: #697efc;
+        }
+
+        .warning-content-item-box {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .warning-content-item-box span {
+            line-height: .5rem;
+            font-size: .24rem;
+            color: #222E6A;
+        }
+
+        .dianjitiaozhuan {
+            flex-grow: 1;
+            position: relative;
+            text-align: center;
+        }
+
+        .dianjitiaozhuan i {
+            position: absolute;
+            top: 45%;
+            transform: translate(-50%, -50%);
+            font-size: .48rem;
+            color: #222E6A;
+            opacity: 0.6;
+        }
+
+        /*预警通知-End*/
+
+
+        /*未清洗平台监测详情列表-Start*/
+
+        .cleaning-item {
+            margin: 12px 14px 0 15px;
+            padding: 12px 12px 15px 12px;
+            background: linear-gradient(287deg, #41ADFD 0%, #2473F6 100%);
+            box-shadow: 0px 3px 6px rgba(54, 57, 254, 0.11);
+            border-radius: 4px;
+        }
+
+        .cleaning-item.offline {
+            background: #FFFFFF;
+        }
+
+        .cleaning-icon {
+            position: relative;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(317deg, #1717FF 0%, #9EABFC 100%);
+            opacity: 1;
+            border-radius: 8px;
+        }
+
+        .cleaning-icon.offline {
+            background: linear-gradient(270deg, #CFCFCF 0%, #808080 100%);
+        }
+
+        .cleaning-icon i {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            font-size: .24rem;
+            color: #FFFFFF;
+            opacity: 1;
+
+        }
+
+        .cleaning-name {
+            font-size: .28rem;
+            font-weight: bold;
+            color: #FFFFFF;
+        }
+
+        .cleaning-name.offline {
+            color: #646A73;
+        }
+
+        .cleaning-position {
+            flex-grow: 1;
+            text-align: right;
+            font-size: .28rem;
+            font-weight: bold;
+            color: #FFFFFF;
+        }
+
+        .cleaning-position.offline {
+            color: #646A73;
+        }
+
+        .cleaning-detailed {
+            margin-top: 14px;
+        }
+
+        .cleaning-detailed div {
+            padding: 12px 0 11px 0;
+            width: 33%;
+            line-height: .36rem;
+            text-align: center;
+            opacity: 1;
+            border-radius: 4px;
+        }
+
+        /*未清洗平台监测详情列表-End*/
+    </style>
+</head>
+
+<body>
+    <div id="contain">
+
+        <!--时间选择-->
+        <van-sticky>
+            <van-sticky>
+                <van-row type="flex" justify="space-between">
+                    <van-cell title="选择日期" is-link :value="timevalue|datefmt" @click="timeshow = true"></van-cell>
+
+                    <van-popup v-model="timeshow" position="bottom">
+                        <van-datetime-picker @confirm="timeOnConfirm" v-model="timevalue" type="date">
+                        </van-datetime-picker>
+                    </van-popup>
+
+                </van-row>
+            </van-sticky>
+        </van-sticky>
+
+        <!--预警通知-->
+        <div class="todaywarning">
+            <div class="warning-title">
+                <span>预警通知</span>
+            </div>
+            <!-- 预警内容 -->
+            <van-row type="flex" class="warning-box">
+                <van-col class="warning-icon">
+                    <i class="iconfont icon-tixing"></i>
+                </van-col>
+                <van-col span="16" class="warning-content-item">
+                    <div class="warning-content-item-box">
+                        <span>监测鄂C 1234未清洗</span>
+                        <span>30分钟前</span>
+                    </div>
+                    <div class="warning-content-item-box">
+                        <span>监测鄂C52A3未清洗</span>
+                        <span>30分钟前</span>
+                    </div>
+                </van-col>
+                <van-col class="dianjitiaozhuan">
+                    <i class="iconfont icon-dianjitiaozhuan"></i>
+                </van-col>
+            </van-row>
+        </div>
+
+        <!--未清洗平台监测详情列表-->
+        <template v-for="(item,index) in 3">
+            <div class="cleaning-item" v-if="item<=2">
+                <van-row type="flex">
+                    <van-col span="2">
+                        <div class="cleaning-icon">
+                            <i class="iconfont icon-qingxi"></i>
+                        </div>
+                    </van-col>
+                    <van-col class="cleaning-name">
+                        <span>未清洗监控1#</span>
+                    </van-col>
+                    <van-col class="cleaning-position">
+                        <span>1#楼分组</span>
+                    </van-col>
+                </van-row>
+                <van-row type="flex" justify="space-between" class="cleaning-detailed">
+                    <van-col>
+                        <p style="font-size: .24rem;color: #FFFFFF;">今日监测</p>
+                        <p style="font-size: .20rem;color: #FFFFFF;">11次</p>
+                    </van-col>
+                    <van-col>
+                        <p style="font-size: .24rem;color: #FFFFFF;">今日预警</p>
+                        <p style="font-size: .20rem;color: #FFFFFF;">3次</p>
+                    </van-col>
+                    <van-col>
+                        <p style="font-size: .24rem;color: #FFFFFF;">当前状态</p>
+                        <p style="font-size: .32rem;color: #FFFFFF;">在线</p>
+                    </van-col>
+                </van-row>
+            </div>
+
+            <div class="cleaning-item offline" v-if="item==3">
+                <van-row type="flex">
+                    <van-col span="2">
+                        <div class="cleaning-icon offline">
+                            <i class="iconfont icon-qingxi"></i>
+                        </div>
+                    </van-col>
+                    <van-col class="cleaning-name offline">
+                        <span>未清洗监控1#</span>
+                    </van-col>
+                    <van-col class="cleaning-position offline">
+                        <span>1#楼分组</span>
+                    </van-col>
+                </van-row>
+                <van-row type="flex" justify="space-between" class="cleaning-detailed">
+                    <van-col>
+                        <p style="font-size: .24rem;color: #646A73;">今日监测</p>
+                        <p style="font-size: .20rem;color: #646A73;">11次</p>
+                    </van-col>
+                    <van-col>
+                        <p style="font-size: .24rem;color: #646A73;">今日预警</p>
+                        <p style="font-size: .20rem;color: #646A73;">3次</p>
+                    </van-col>
+                    <van-col>
+                        <p style="font-size: .24rem;color: #646A73;">当前状态</p>
+                        <p style="font-size: .32rem;color: #646A73;">在线</p>
+                    </van-col>
+                </van-row>
+            </div>
+        </template>
+
+    </div>
+</body>
+
+</html>
+
+
+<script>
+    var date = new Date();
+    var vm = new Vue({
+        el: "#contain",
+        data: {
+            apiUrl: 'https://site.tieweizhixing.com/',
+            timevalue: date, //筛选时间
+            timeshow: false,//显示时间选择
+        },
+        created() {
+            (function (win, doc) {
+                //rem兼容
+                if (!win.addEventListener) return;
+                var html = document.documentElement;
+                function setFont() {
+                    var cliWidth = html.clientWidth;
+                    if (cliWidth > 750) {
+                        cliWidth = 750;
+                    }
+                    html.style.fontSize = 100 * (cliWidth / 750) + "px";
+                }
+                win.addEventListener("resize", setFont, false);
+                doc.addEventListener("DOMContentLoaded", setFont, false);
+            })(window, document);
+        },
+        mounted() {
+        },
+        methods: {
+            timeOnConfirm(date) {
+                this.timeshow = false;
+                this.timevalue = date;
+            }
+        },
+        filters: {
+            datefmt(date) {
+                if (date) {
+                    return this.moment(date).format('YYYY/MM/DD');
+                } else {
+                    return "";
+                }
+            }
+        }
+
+    });
+</script>

@@ -1,0 +1,75 @@
+{
+    "pages": [
+        "pages/mycompanyproject/mycompanyproject",
+        "pages/auth/auth",
+        "pages/index/index",
+        "pages/notify/notify",
+        "pages/proindex/proindex",
+        "pages/emcs/emcs",
+        "pages/more/more",
+        "pages/customer/customer",
+        "pages/subsidiaryaddapproval/subsidiaryaddapproval",
+        "pages/subsidiarychangeapproval/subsidiarychangeapproval",
+        "pages/subsidiarydetails/subsidiarydetails",
+        "pages/project/project",
+        "pages/projectaddapproval/projectaddapproval",
+        "pages/projectchangeapproval/projectchangeapproval",
+        "pages/projectdetails/projectdetails",
+        "pages/webview/webview",
+        "pages/issuesm/issuesm",
+        "pages/compannotifyview/compannotifyview",
+        "pages/privacypolicy/privacypolicy",
+        "pages/videosurvedetail/videosurvedetail"
+    ],
+    "window": {
+        "backgroundTextStyle": "light",
+        "navigationBarBackgroundColor": "#fff",
+        "navigationBarTitleText": "Weixin",
+        "navigationBarTextStyle": "black"
+    },
+    "tabBar": {
+        "custom": true,
+        "color": "#9C9C9C",
+        "selectedColor": "#000000",
+        "backgroundColor": "#FBFBFB",
+        "borderStyle": "white",
+        "list": [
+            {
+                "pagePath": "pages/index/index",
+                "text": "首页",
+                "iconPath": "images/menu/discovery.png",
+                "selectedIconPath": "images/menu/discovery_focus.png"
+            },
+            {
+                "pagePath": "pages/notify/notify",
+                "text": "通知",
+                "iconPath": "images/menu/chat.png",
+                "selectedIconPath": "images/menu/chat_focus.png"
+            },
+            {
+                "pagePath": "pages/proindex/proindex",
+                "text": "首页",
+                "iconPath": "images/menu/discovery.png",
+                "selectedIconPath": "images/menu/discovery_focus.png"
+            },
+            {
+                "pagePath": "pages/emcs/emcs",
+                "text": "设备监控",
+                "iconPath": "images/menu/emcs.png",
+                "selectedIconPath": "images/menu/emcs_focus.png"
+            },
+            {
+                "pagePath": "pages/more/more",
+                "text": "我的",
+                "iconPath": "images/menu/burger.png",
+                "selectedIconPath": "images/menu/burger_focus.png"
+            }
+        ]
+    },
+    "usingComponents": {},
+    "networkTimeout": {
+        "request": 10000,
+        "downloadFile": 10000
+    },
+    "sitemapLocation": "sitemap.json"
+}

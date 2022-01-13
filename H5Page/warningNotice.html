@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <!--微信-->
+  <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.3.2.js"></script>
+  <!-- Vant -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@2.12/lib/index.css" />
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6/dist/vue.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vant@2.12/lib/vant.min.js"></script>
+  <!--moment时间过滤-->
+  <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.js"></script>
+  <!--echarts-->
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.2.0/dist/echarts.min.js"></script>
+  <!--axios-->
+  <script src="https://cdn.jsdelivr.net/npm/axios@0.21.4/dist/axios.min.js"></script>
+  <title>预警通知</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #F2F2F2;
+    }
+
+    /* 搜索框-Start */
+    .search {
+      top: 0;
+      height: 35px;
+      padding: 14px 14px 12px 15px;
+      background: #F2F2F2;
+      border-bottom: 1px solid #E2E2E2;
+    }
+
+    .search-select {
+      height: 34px;
+      font-size: 14px;
+      color: #646A73;
+      border: 1px solid rgba(112, 112, 112, 0.2);
+      opacity: 1;
+      border-radius: 20px;
+    }
+
+    .search-select-value {
+      line-height: 20px;
+    }
+
+    /* 搜索框-End */
+
+
+    /* 预警列表-Start */
+    .warning-item {
+      position: relative;
+      margin: 12px 18px 0 0;
+      padding-left: 41px;
+    }
+
+    .warning-item:before {
+      content: " ";
+      position: absolute;
+      top: -12px;
+      bottom: -120px;
+      left: 20px;
+      border-left: 1px solid #E2E2E2;
+      color: #E2E2E2;
+      -webkit-transform-origin: 0 0;
+      transform-origin: 0 0;
+      -webkit-transform: scaleY(.5);
+      transform: scaleY(.5);
+    }
+
+    .warning-item-mark {
+      position: absolute;
+      top: 40%;
+      left: 15px;
+      width: 12px;
+      height: 12px;
+      background: #FFFFFF;
+      box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
+      border-radius: 50%;
+      opacity: 1;
+    }
+
+    .warning-item-_color {
+      margin: 2px auto;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      opacity: 1;
+    }
+
+    .warning-item-box {
+      padding: 20px 0 20px 12px;
+      background: #FFFFFF;
+      box-shadow: 0px 3px 6px rgba(94, 94, 141, 0.2);
+      opacity: 1;
+      border-radius: 8px;
+    }
+
+    .warning-item-time {
+      position: relative;
+    }
+
+    .warning-item-time p {
+      margin: 2px;
+      line-height: 24px;
+      font-size: 12px;
+    }
+
+    .warning-item-time:after {
+      content: " ";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      right: 20px;
+      height: 90px;
+      border-right: 1px solid #E2E2E2;
+      color: #E2E2E2;
+      -webkit-transform-origin: 0 0;
+      transform-origin: 0 0;
+      -webkit-transform: scaleY(.5);
+      transform: scaleY(.5);
+    }
+
+    .warning-item-content p {
+      line-height: 24px;
+      font-size: 12px;
+    }
+
+    .warning-item-content h4 {
+      line-height: 24px;
+      font-size: 12px;
+    }
+
+
+    /* 报警列表-End */
+  </style>
+</head>
+
+<body>
+  <div id="contain">
+    <!--搜索栏-->
+    <van-sticky>
+      <div class="search">
+        <van-row type="flex" justify="space-around">
+          <!--时间选择-->
+          <van-col span="11">
+            <div class="search-select" @click="timeshow = true">
+              <div role="button" style="padding: 7px 12px 7px 12px;">
+                <van-row type="flex" justify="space-between">
+                  <div class="search-select-value">
+                    <span>{{timevalue|datefmt}}</span>
+                  </div>
+                  <i class="van-icon van-icon-arrow van-cell__right-icon"></i>
+                </van-row>
+              </div>
+            </div>
+            <van-popup v-model="timeshow" position="bottom">
+              <van-datetime-picker @confirm="timeOnConfirm" v-model="timevalue" type="date">
+              </van-datetime-picker>
+            </van-popup>
+          </van-col>
+          <!--级别选择-->
+          <van-col span="11">
+            <div class="search-select" @click="levelchoose.showPicker = true">
+              <div role="button" style="padding: 7px 12px 7px 12px;">
+                <van-row type="flex" justify="space-between">
+                  <div class="search-select-value">
+                    <span>{{levelchoose.value==""?"级别":levelchoose.value}}</span>
+                  </div>
+                  <i class="van-icon van-icon-arrow van-cell__right-icon"></i>
+                </van-row>
+              </div>
+            </div>
+            <van-popup v-model="levelchoose.showPicker" position="bottom">
+              <van-picker show-toolbar :columns="levelchoose.columns" @confirm="levelOnConfirm"
+                @cancel="levelchoose.showPicker = false" />
+            </van-popup>
+          </van-col>
+        </van-row>
+      </div>
+    </van-sticky>
+
+    <!--报警详情-->
+    <div class="warninglist">
+      <template v-for="(item, index) in alarmMessage" :key="index">
+        <div class="warning-item">
+          <div class="warning-item-mark">
+            <div v-if="item.level=='level1'" class="warning-item-_color" style="background: #FF9600;"></div>
+            <div v-if="item.level=='level2'" class="warning-item-_color" style="background: #FAD900;"></div>
+            <div v-if="item.level=='level3'" class="warning-item-_color" style="background: #3BB4E2;"></div>
+          </div>
+          <div class="warning-item-box">
+            <van-row type="flex">
+              <van-col span="7" class="warning-item-time">
+                <p>{{item.createDate|datefmt1}}</p>
+                <p>{{item.createDate|datefmt2}}</p>
+              </van-col>
+              <van-col span="17" class="warning-item-content">
+                <h4 v-if="item.level=='level1'">一级预警</h4>
+                <h4 v-if="item.level=='level2'">二级预警</h4>
+                <h4 v-if="item.level=='level3'">三级预警</h4>
+                <p>{{item.title}}</p>
+              </van-col>
+            </van-row>
+          </div>
+        </div>
+      </template>
+    </div>
+  </div>
+</body>
+
+
+<script src="./js/public.js"></script>
+<script>
+  var date = new Date();
+  new Vue({
+    el: "#contain",
+    data: {
+      platCode: getUrlParam('platCode'),
+      corpCode: getUrlParam('corpCode'),
+      projectCode: getUrlParam('projectCode'),
+      token: getUrlParam('token'),
+      userCode: getUrlParam('userCode'),
+      apiUrl: 'https://site.tieweizhixing.com',
+      timevalue: date, //筛选时间
+      timeshow: false,//显示时间选择
+      levelchoose: {
+        key: '',
+        value: '',
+        columns: ['一级', '二级', '三级'],
+        showPicker: false,
+      },
+      alarmMessage: [],//报警信息
+
+    },
+    created() { },
+    mounted() {
+      this.getAlarmMessageByProject()
+    },
+    methods: {
+      timeOnConfirm(date) {//时间选择
+        this.timeshow = false;
+        this.timevalue = date;
+        this.getAlarmMessageByProject();
+      },
+      levelOnConfirm(data) {//登记选择
+        this.levelchoose.value = data;
+        if (data == "一级") {
+          this.levelchoose.key = "level1";
+        }
+        else if (data == "二级") {
+          this.levelchoose.key = "level2";
+        }
+        else {
+          this.levelchoose.key = "level3";
+        }
+        this.levelchoose.showPicker = false;
+        this.getAlarmMessageByProject();
+      },
+      getAlarmMessageByProject() {//获取预警通知数据
+        var that = this;
+        var params = {
+          platCode: that.platCode,
+          projectCode: that.projectCode,
+          msgType: "alarm",
+          beginTime: moment(that.timevalue).format('YYYY-MM-DD'),
+          endTime: moment(that.timevalue).format('YYYY-MM-DD')
+        };
+        if (that.levelchoose.key != '') {
+          params["level"] = that.levelchoose.key
+        }
+        axios.post(that.apiUrl + "/oaservice/message/20/getAlarmMessageByProject", params)
+          .then(res => {
+            if (res.data.code == '1') {
+              that.alarmMessage = res.data.data.list;
+            }
+          })
+          .catch(err => {
+            console.error(err);
+          })
+      }
+    },
+    filters: {
+      datefmt(date) {
+        if (date) {
+          return this.moment(date).format('YYYY/MM/DD');
+        } else {
+          return "";
+        }
+      },
+      datefmt1(date) {
+        if (date) {
+          return this.moment(date).format('YYYY.MM.DD');
+        } else {
+          return "";
+        }
+      },
+      datefmt2(date) {
+        if (date) {
+          var str = "";
+          var hour = this.moment(date).format('mm');
+          if (hour < 4) {
+            str = '凌晨';
+
+          } else if (hour < 6) {
+            str = '早上';
+
+          } else if (hour < 11) {
+            str = '上午';
+
+          } else if (hour < 13) {
+            str = '中午';
+
+          } else if (hour < 16) {
+            str = '下午';
+
+          } else if (hour < 20) {
+            str = '晚上';
+
+          } else {
+            str = '晚上';
+          }
+          return str + " " + this.moment(date).format('mm:ss');
+        } else {
+          return "";
+        }
+      }
+    }
+  });
+</script>
+
+
+</html>

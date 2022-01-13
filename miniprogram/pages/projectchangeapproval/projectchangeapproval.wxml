@@ -1,0 +1,90 @@
+<!--pages/addapproval/addapproval.wxml-->
+<view class="page">
+    <!-- 基本信息 -->
+    <view class="page__bd">
+        <view class="weui-cells__title">基本信息</view>
+        <view class="weui-cells weui-cells_after-title">
+            <view class="weui-cell">
+                <view class="weui-cell__bd">项目名称</view>
+                <view class="weui-cell__ft">{{examineContent[0].value.text}}</view>
+            </view>
+            <view class="weui-cell">
+                <view class="weui-cell__bd">立项日期</view>
+                <view class="weui-cell__ft">{{examineContent[4].value.text}}</view>
+            </view>
+            <view class="weui-cell">
+                <view class="weui-cell__bd">项目地址</view>
+                <view class="weui-cell__ft">{{examineContent[1].value.text}}</view>
+            </view>
+            <view class="weui-cell">
+                <view class="weui-cell__bd">联系人</view>
+                <view class="weui-cell__ft">{{examineContent[2].value.text}}</view>
+            </view>
+            <view class="weui-cell">
+                <view class="weui-cell__bd">联系电话</view>
+                <view class="weui-cell__ft">{{examineContent[3].value.text}}</view>
+            </view>
+            <view class="weui-cell">
+                <view class="weui-cell__bd">发起人</view>
+                <view class="weui-cell__ft">{{approver}}</view>
+            </view>
+        </view>
+    </view>
+    <!-- 授权信息 -->
+    <view class="page__bd">
+        <view class="weui-cells__title">项目授权</view>
+    </view>
+    <!-- 更变列表 -->
+    <!--
+
+<view class="changecontent">
+        <view class="weui-cells_checkbox">
+            <checkbox-group bindchange="checkboxChange">
+                <view class="checkboxs">
+                    <block wx:for="{{checkboxItems}}" wx:key="value">
+                        <view class="checkboxs_flex ">
+                            <label class="checkboxs" style="flex: 0 0 218rpx;">
+                                <view class="checkboxs__hd">
+                                    <checkbox class="weui-check" value="{{item.value}}" checked="{{item.checked}}" />
+                                    <i class="weui-icon-checked"></i>
+                                </view>
+                                <view class="checkboxs__bd">
+                                    <text>
+                                        {{item.name}}
+                                    </text>
+                                </view>
+                            </label>
+                        </view>
+
+                    </block>
+                </view>
+            </checkbox-group>
+        </view>
+    </view>
+ -->
+    <view class="changecontent">
+        <view class="weui-flex weui-flex_wrap">
+            <view class="weui-flex__item weui-flex__item_flex" wx:for="{{authorizationProject}}" wx:key="{{index}}" wx:if="{{item}}">
+                <view class="changecontent-list">
+                    <text>{{item}}</text>
+                </view>
+            </view>
+
+        </view>
+    </view>
+    <!--按钮-->
+    <!-- <view class="btnarea"  wx:if="{{showbtn=='yes'}}">
+        <view class="weui-flex">
+            <view class="weui-flex__item">
+                <view class="placeholder">
+                    <a class="weui-btn weui-btn-yes">同意</a>
+                </view>
+            </view>
+            <view class="weui-flex__item">
+                <view class="placeholder">
+                    <a class="weui-btn weui-btn-no">拒绝</a>
+                </view>
+            </view>
+        </view>
+    </view> -->
+</view>

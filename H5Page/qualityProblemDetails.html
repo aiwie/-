@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <!--jquery-->
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+  <!--微信-->
+  <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.3.2.js"></script>
+  <!-- Vant -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@2.12/lib/index.css" />
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6/dist/vue.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vant@2.12/lib/vant.min.js"></script>
+  <!--阿里巴巴图标-->
+  <link rel="stylesheet" href="js/iconfont/iconfont.css" />
+  <!--axios-->
+  <script src="https://cdn.jsdelivr.net/npm/axios@0.21.4/dist/axios.min.js"></script>
+  <!--高德地图-->
+  <script
+    src="https://webapi.amap.com/maps?v=1.4.15&key=aaf1ef61096f6ec64b68ee37491572d7&plugin=AMap.PolyEditor,AMap.CircleEditor,AMap.Geocoder,AMap.MouseTool,AMap.MarkerClusterer,AMap.DistrictSearch">
+    </script>
+  <!--地点位置数据-->
+  <script src="js/arealist.js"></script>
+
+  <title id="title">详情</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    /* 表单-Start*/
+    .form {
+      margin: 15px;
+      margin-bottom: 70px;
+    }
+
+    .van-cell {
+      margin-top: 8px;
+      background: #F1F3F5;
+      border-radius: 8px;
+    }
+
+
+    #container {
+      width: 100%;
+      height: 10rem;
+      margin-top: 5px;
+    }
+
+    .amap-geolocation-con {
+      z-index: 1 !important;
+    }
+
+    /* 表单-End */
+
+
+    /* 确认按钮-Start*/
+    .button {
+      z-index: 99999;
+      position: fixed;
+      width: 100%;
+      height: 60px;
+      bottom: 0;
+      background: #F2F2F2;
+      border-top: 1px solid #E2E2E2;
+    }
+
+    /* 确认按钮-End */
+  </style>
+</head>
+
+<body>
+  <div id="contain">
+
+    <!--表单-->
+    <van-form class="form" readonly="true">
+      <h4>基本信息</h4>
+      <van-cell title="问题程度" is-link name="problemlevel" :value="levelName==''?'选择问题程度':levelName">
+      </van-cell>
+
+      <van-cell title="问题类型" is-link name="picker" :value="typeName==''?'选择问题类型':typeName">
+      </van-cell>
+      <van-divider></van-divider>
+
+      <h4>问题描述</h4>
+      <van-field v-model="descvlaue" rows="2" autosize type="textarea" maxlength="100" placeholder="请输入问题描述"
+        show-word-limit></van-field>
+      <van-divider></van-divider>
+
+      <h4>整改期限</h4>
+      <van-cell title="整改日期" is-link name="picker" :value="validate==''?'选择整改日期':validate">
+      </van-cell>
+      <van-divider></van-divider>
+
+      <h4 v-if="images.length">图片</h4>
+      <van-row type="flex" style="margin-top: 10px;" v-if="images.length">
+        <van-image style="margin-right: 10px;" width="100" height="100" :src="item" v-for="item in images"
+          @click="showImgPopup(item)" />
+      </van-row>
+      <van-popup v-model="imgShow">
+        <van-image style="margin-bottom: -5px;" width="300" height="300" :src="imgShowUrl" />
+      </van-popup>
+      <van-divider></van-divider>
+
+      <van-row type="flex" justify="space-between">
+        <van-col>
+          <h4>地点</h4>
+        </van-col>
+      </van-row>
+      <van-field style="margin-top: 1px;" v-model="address" label="详细地址" placeholder="请输入详细地址或点击地图" input-align="right">
+      </van-field>
+      <div id="container"> </div>
+      <van-divider></van-divider>
+
+
+      <h4>整改人</h4>
+      <van-cell title="整改人" is-link :value="reformuser"></van-cell>
+    </van-form>
+
+
+    <!--确认按钮-->
+    <!-- <div class="button" v-if="currentTab =='1' ? false : true">
+      <van-row type="flex" justify="space-around" style="height: 100%;align-items:center;">
+        <van-col span="11">
+          <van-button type="info" block round color="#C5C8D2" @click="goBackUrl">驳回</van-button>
+        </van-col>
+        <van-col span="11">
+          <van-button type="info" block round color="#6A8AF0" v-on:click="submitForm">整改</van-button>
+        </van-col>
+      </van-row>
+    </div> -->
+
+
+
+  </div>
+</body>
+
+
+<script src="./js/public.js"></script>
+<script>
+  var date = new Date();
+  var year = date.getFullYear();
+  var month = date.getMonth();
+  var strDate = date.getDate();
+  let title = document.querySelector('#title')
+  let examineType = getUrlParam('examineType')
+  title.innerHTML = examineType == 'quality' ? '质量问题详情' : '安全问题详情'
+
+  var vm = new Vue({
+    el: "#contain",
+    data: {
+      platCode: getUrlParam('platCode'),
+      corpCode: getUrlParam('corpCode'),
+      projectCode: getUrlParam('projectCode'),
+      token: getUrlParam('token'),
+      userCode: getUrlParam('userCode'),
+      userName: getUrlParam('userName'),
+      projectId: getUrlParam('projectId'),
+      requestCode: getUrlParam('requestCode'),
+      currentTab: getUrlParam('currentTab'),
+      gpsFenceStyr: [],
+      porJetLng: '',
+      porJetLat: '',
+      apiUrl: 'https://site.tieweizhixing.com', //接口domain
+      value: '',
+      levelColumns: [], //问题程度
+      levelName: '', //问题层度显示名称 
+      typeColumns: [], //问题类型
+      typeName: '', //问题类型显示名称
+      descvlaue: '', //问题描述
+      minDate: new Date(year, month, strDate), //最小整改日期
+      validate: '', //整改日期
+      images: [],//图片
+      areaName: '', //地点显示名称
+      address: '', //详细地址
+      reformuser: '', //整改人手机号
+      reformuserName: '', //整改人姓名
+      reportGps: [], // 问题点位Gps
+      isuueType: [], // 问题类型匹配
+      imgShow: false, // 点击图片展开大图
+      imgShowUrl: '' // 大图展示地址
+    },
+    created() {
+    },
+    mounted() {
+      this.getAapprovedWork()
+      this.getProjectList()
+    },
+    methods: {
+      showImgPopup(item) {
+        if (item) {
+          this.imgShowUrl = ''
+          this.imgShowUrl = item
+          this.imgShow = true
+        }
+      },
+      getAapprovedWork() { // 详情api
+        axios.post(this.apiUrl + '/projectservice/report/20/getReportDataDetail', {
+          requestCode: this.requestCode
+        })
+          .then(res => {
+            if (res.data.code == '1') {
+              let contents = res.data.data.content.data
+              let gps = res.data.data.reportGps.split(',');
+              this.reportGps = [Number(gps[0]), Number(gps[1])]
+              this.levelName = contents[0].value + '问题'
+              this.typeName = contents[1].value
+              this.descvlaue = contents[2].value
+              this.validate = contents[3].value
+              this.images = contents[4].value
+              this.address = contents[5].value
+              this.reformuser = contents[6].userName + contents[6].value
+            } else {
+              this.goBackUrl()
+            }
+          })
+          .catch(err => {
+          })
+
+      },
+      getDictionary(code, type, callback) { // 按问题各类统计api
+        params = {
+          token: this.token,
+          platCode: this.platCode,
+          reportTypeCode: code,
+          dictTag: type,
+        }
+        axios.post(this.apiUrl + '/projectservice/report/20/getDictionary', params).then(res => {
+          if (res.data.code == '1') {
+            callback(res.data.data.list)
+          }
+        })
+      },
+      getProjectList() { // 调用 整个项目记录
+        axios.post(this.apiUrl + "/token-service/project/20/selectEmployeeProjectList", {
+          token: this.token
+        })
+          .then(res => {
+            if (res.data.code == '1') {
+              res.data.data.list.forEach(item => {
+                if (item.projectId == this.projectId) {
+                  electronicRail(JSON.parse(item.gpsFence))
+                }
+              })
+            } else {
+            }
+          })
+          .catch(err => {
+          })
+      },
+      // submitForm() { //整改
+      //   var that = this;
+      //   if (that.formValidator()) {
+      //     return;
+      //   }
+      //   var params = that.formData;
+      //   var content = that.setFormContent();
+      //   params["content"] = content;
+      //   axios.post(that.apiUrl + "/projectservice/report/20/addReportData", params)
+      //     .then(res => {
+      //       if (res.data.code == '1') {
+      //         that.$toast.success('上报成功！');
+      //         that.goBackUrl()
+      //       } else {
+      //         that.$toast(res.data.msg);
+      //         return;
+      //       }
+      //     })
+      //     .catch(err => {
+      //       console.error(err);
+      //     })
+      // },
+      goBackUrl() { // 取消返回上一层
+        window.history.go(-1)
+      },
+      setFormContent() { //设置表单内容
+        var that = this;
+        var images = [];
+        that.images.forEach(item => {
+          images.push(item.url)
+        });
+        return {
+          data: [{
+            "key": "safetylevel",
+            "name": "问题程度",
+            "value": that.levelName
+          },
+          {
+            "key": "safetytype",
+            "name": "问题分类",
+            "value": that.typeName
+          },
+          {
+            "key": "desc",
+            "name": "问题描述",
+            "value": that.descvlaue
+          },
+          {
+            "key": "validate",
+            "name": "整改期限",
+            "value": that.validate
+          },
+          {
+            "key": "image",
+            "name": "图片",
+            "value": images
+          },
+          {
+            "key": "address",
+            "name": "详细地点",
+            "value": that.address
+          },
+          {
+            "key": "reformuser",
+            "name": "整改人",
+            "value": that.reformuser,
+            "userName": that.reformuserName,
+          }]
+        };
+      },
+
+    }
+  });
+
+  var map = new AMap.Map("container", {
+    resizeEnable: false, //启用调整大小
+    dragEnable: false, //拖动
+    zoom: 10,
+  });
+
+
+  AMap.plugin('AMap.Geolocation', function () {
+    var geolocation = new AMap.Geolocation({
+      enableHighAccuracy: true, //是否使用高精度定位，默认:true
+      timeout: 10000, //超过10秒后停止定位，默认：5s
+      buttonPosition: 'RB', //定位按钮的停靠位置
+      buttonOffset: new AMap.Pixel(10, 20), //定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
+      zoomToAccuracy: true, //定位成功后是否自动调整地图视野到定位点
+    });
+    map.addControl(geolocation);
+  });
+
+  var lnglats = [];
+  var marker = new AMap.Marker();
+  var geocoder = new AMap.Geocoder({});
+
+
+  // 设置地图中心的及层级 - 电子围栏
+  function electronicRail(val) {
+    let newGpsFen = []
+    val.forEach(item => {
+      newGpsFen.push([item.lng, item.lat])
+    })
+    var polygon = new AMap.Polygon({
+      path: newGpsFen,
+      fillColor: '#5ea8e699', // 多边形填充颜色
+      strokeColor: '#fff', // 线条颜色
+      map: map
+    })
+    this.contentGps = polygon.getBounds().getCenter()
+    this.map.setFitView([polygon], true)
+    // 点位
+    marker.setPosition(vm.reportGps);
+    map.add(marker);
+  }
+
+
+</script>
+
+
+</html>

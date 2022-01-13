@@ -1,0 +1,20 @@
+<!--pages/auth/auth.wxml-->
+<view class="auth">
+    <view class="auth-log">
+        <image mode="scaleToFill" src="{{logoUrl}}" alt="" />
+    </view>
+    <view class="programname">
+        <text>智慧工地</text>
+    </view>
+    <cover-image class="auth-img" src="{{imgurl}}"></cover-image>
+    <view class="msg-title">仅支持智慧工地平台用户使用</view>
+    <button class="login" open-type="{{ !checkChage ? '' : 'getPhoneNumber'}}" bindgetphonenumber="getPhoneNumber" bindtap="checkChangeMsg">
+        使用手机号一键登录
+    </button>
+    <view class="privacy">
+        <checkbox-group bindchange="checkboxChange">
+            <checkbox class="p-check" checked="{{checkChage}}" value="{{checkChage}}"></checkbox>
+        </checkbox-group>
+        <view class="priv">登录代表您已同意{{'《'}}<view class="priv-text" bindtap="jumpPrivacy">智慧工地隐私政策</view>{{'》'}}</view>
+    </view>
+</view>

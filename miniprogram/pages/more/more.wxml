@@ -1,0 +1,41 @@
+<!--pages/more/more.wxml-->
+<custom-navbar title="{{title}}" homePath="/pages/mycompanyproject/mycompanyproject" ></custom-navbar>
+
+<view class="page">
+    <!-- 头部 -->
+    <view class="top">
+        <image class="top-img" src="/images/index_top.png"></image>
+        <view class="weui-flex">
+            <view class="weui-flex__item top-border">
+                <view class="dis-flex flex-dir-column flex-y-center user-header-box">
+                    <view class="user-header-avatar">
+                        <open-data class="userAvatar" lang="zh_CN" type="userAvatarUrl"></open-data>
+                    </view>
+                    <view class="user-header-name">
+                        <open-data type="userNickName"></open-data>
+                    </view>
+                    <!-- <view class="user-header-id">
+                        <text>ID：</text><text>65021389</text>
+                    </view> -->
+                </view>
+               
+            </view> 
+        </view>
+            <view class="userinfo">
+    <block >
+            <navigator url='/pages/auth/auth' open-type="reLaunch" >退出登录</navigator>  
+    </block>
+ 
+    </view>
+
+
+     <!-- <video direction="0" src="{{url}}" controls="true" objectFit="cover" autoplay :show-fullscreen-btn="false" :show-play-btn="false"> </video>
+        <view >
+               <view bindtap="clickvideo">切换</view>
+        </view> -->
+     
+
+    </view>
+</view>
+
+<view class="tab-slot"></view>

@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "消息中心",
+  "usingComponents": {
+    "custom-navbar":"/components/custom-navbar/index"
+  },
+  "navigationStyle": "custom"
+}

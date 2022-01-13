@@ -1,0 +1,77 @@
+.page{
+  box-sizing: border-box;
+  color: #333;
+  background: #f8f8f8;
+}
+
+
+view,text{
+  --mainColor: #1485EE;
+  --succColor: #439057;
+
+  --focusfont: 40rpx;/*重点数字体大小*/
+  --mainrpx: 36rpx;/*主标题字体大小*/
+  --subtitlefont: 32rpx;/*副标题字体大小*/
+  --bodyfont: 28rpx;/*正文字体大小*/
+  --textfont: 24rpx;/*次文本字体大小*/
+  --restfont: 20rpx;/*其他文字体大小*/
+}
+
+/* flex布局 */
+.dis-flex{
+  display: flex;
+}
+.flex-x-start{
+  display: flex;
+  justify-content: flex-start;
+}
+.flex-x-center {
+  display: flex;
+  justify-content: center;
+}
+.flex-x-between {
+  display: flex;
+  justify-content: space-between;
+}
+.flex-x-around {
+  display: flex;
+  justify-content: space-around;
+}
+.flex-y-center {
+  display: flex;
+  align-items: center;
+}
+.flex-dir-column {
+  flex-direction: column;
+}
+.flex-y-end {
+  display: flex;
+  align-items: flex-end;
+}
+.flex{
+  flex:1
+}
+
+/* 文字多行溢出 */
+.twolist-hidden {
+  display: -webkit-box;
+  word-break: break-all;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+.list-hidden {
+  display: -webkit-box;
+  word-break: break-all;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+
+.box-sizing{
+  box-sizing: border-box;
+}
+

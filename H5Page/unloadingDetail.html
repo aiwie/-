@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <!--jquery-->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <!--微信-->
+    <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.3.2.js"></script>
+    <!-- Vant -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@2.12/lib/index.css" />
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6/dist/vue.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vant@2.12/lib/vant.min.js"></script>
+    <!--阿里巴巴图标-->
+    <link rel="stylesheet" href="js/iconfont/iconfont.css" />
+    <!--axios-->
+    <script src="https://cdn.jsdelivr.net/npm/axios@0.21.4/dist/axios.min.js"></script>
+    <!--moment时间过滤-->
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.js"></script>
+    <!--echarts-->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.2.0/dist/echarts.min.js"></script>
+    <title>卸料平台监控详情</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #F2F2F2;
+        }
+
+        /* rem兼容解决-Start*/
+        /*
+            **使用时有可能造成div等容器过大。
+            **div中放入img时，让div的宽高自适应，此时会造成容器的宽高可能会大于img的宽高.
+            **解决：容器添加  font-size:0 ,然后div中的内容使用rem
+        */
+        div {
+            font-size: 0;
+        }
+
+        div img {
+            width: 1rem;
+        }
+
+        div p {
+            font-size: 0.5rem;
+        }
+
+        .van-cell__title {
+            font-size: .28rem;
+        }
+
+        .van-cell__value {
+            font-size: .28rem;
+        }
+
+        .van-ellipsis {
+            font-size: .36rem;
+        }
+
+        /* rem兼容解决-Start*/
+
+
+
+        /*预警通知-Start*/
+        .todaywarning {
+            margin: 12px 14px 0 15px;
+            padding: 1px;
+            padding-bottom: 18px;
+            background: #FFFFFF;
+            opacity: 1;
+            border-radius: 8px;
+        }
+
+        .warning-title {
+            margin-top: .32rem;
+            font-size: .32rem;
+            text-align: center;
+            font-weight: bold;
+            color: #222E6A;
+        }
+
+        .warning-box {
+            margin-top: 18px;
+        }
+
+        .warning-icon {
+            position: relative;
+            margin-left: .24rem;
+            margin-right: .32rem;
+            width: .88rem;
+            height: .88rem;
+            text-align: center;
+            background: #D6DFFF;
+            border-radius: 60px;
+        }
+
+        .warning-icon i {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            font-size: .52rem;
+            color: #697efc;
+        }
+
+        .warning-content-item-box {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .warning-content-item-box span {
+            line-height: .5rem;
+            font-size: .24rem;
+            color: #222E6A;
+        }
+
+        .dianjitiaozhuan {
+            flex-grow: 1;
+            position: relative;
+            text-align: center;
+        }
+
+        .dianjitiaozhuan i {
+            position: absolute;
+            top: 45%;
+            transform: translate(-50%, -50%);
+            font-size: .48rem;
+            color: #222E6A;
+            opacity: 0.6;
+        }
+
+        /*预警通知-End*/
+
+
+
+        /* 监控详情-Start*/
+        .item {
+            margin: 12px;
+            padding: 12px;
+            background: #FFFFFF;
+            border-radius: 8px;
+        }
+
+        .monitoring-name {
+            font-size: 14px;
+            font-weight: bold;
+            color: #222E6A;
+        }
+
+        .monitoring-unit {
+            font-size: 10px;
+            color: #646A73
+        }
+
+        /* 监控详情-Start*/
+    </style>
+</head>
+
+<body>
+    <div id="contain">
+        <!--时间选择-->
+        <van-sticky>
+            <van-sticky>
+                <van-row type="flex" justify="space-between">
+                    <van-cell title="选择日期" is-link :value="timevalue|datefmt" @click="timeshow = true"></van-cell>
+                    <van-popup v-model="timeshow" position="bottom">
+                        <van-datetime-picker @confirm="timeOnConfirm" v-model="timevalue" type="date">
+                        </van-datetime-picker>
+                    </van-popup>
+                </van-row>
+            </van-sticky>
+        </van-sticky>
+
+        <!--预警通知-->
+        <div class="todaywarning">
+            <div class="warning-title">
+                <span>预警通知</span>
+            </div>
+            <!-- 预警内容 -->
+            <van-row type="flex" class="warning-box">
+                <van-col class="warning-icon">
+                    <i class="iconfont icon-tixing"></i>
+                </van-col>
+                <van-col span="16" class="warning-content-item">
+                    <div class="warning-content-item-box">
+                        <span>超重预警>3T</span>
+                        <span>30分钟前</span>
+                    </div>
+                    <div class="warning-content-item-box">
+                        <span>倾斜幅度过大</span>
+                        <span>30分钟前</span>
+                    </div>
+                </van-col>
+                <van-col class="dianjitiaozhuan">
+                    <i class="iconfont icon-dianjitiaozhuan"></i>
+                </van-col>
+            </van-row>
+        </div>
+
+        <!--监控详情-->
+        <div class="item">
+            <van-row type="flex" justify="space-between">
+                <van-col class="monitoring-name">承重数据</van-col>
+                <van-col class="monitoring-unit">单位：T/吨</van-col>
+            </van-row>
+            <div id="bearingCharts" style="width: 100%;height:200px;"></div>
+        </div>
+
+        <div class="item">
+            <van-row type="flex" justify="space-between">
+                <van-col class="monitoring-name">拉力数据</van-col>
+                <van-col class="monitoring-unit">单位：m/米</van-col>
+            </van-row>
+            <div id="pullCharts" style="width: 100%;height:200px;"></div>
+        </div>
+
+    </div>
+</body>
+
+</html>
+
+
+<script>
+    var date = new Date();
+    var vm = new Vue({
+        el: "#contain",
+        data: {
+            apiUrl: 'https://site.tieweizhixing.com/',
+            timevalue: date, //筛选时间
+            timeshow: false,//显示时间选择
+
+            bearingCharts: '', //承重数据折线图数据
+            bearingdata: [4.8, 6.4, 9.3, 12.4, 16.9, 28.3, 25.2, 21.8, 13.9], //承重数据数据
+
+            pullCharts: '', //拉力折线图数据
+            pulldata: [4.8, 6.4, 9.3, 12.4, 16.9, 28.3, 25.2, 21.8, 13.9], //拉力数据
+
+        },
+        created() {
+            (function (win, doc) {
+                //rem兼容
+                if (!win.addEventListener) return;
+                var html = document.documentElement;
+                function setFont() {
+                    var cliWidth = html.clientWidth;
+                    if (cliWidth > 750) {
+                        cliWidth = 750;
+                    }
+                    html.style.fontSize = 100 * (cliWidth / 750) + "px";
+                }
+                win.addEventListener("resize", setFont, false);
+                doc.addEventListener("DOMContentLoaded", setFont, false);
+            })(window, document);
+            //监听事件页面大小发送变化发生
+            window.addEventListener('resize', this.resetSize);
+        },
+        mounted() {
+            this.getList();
+        },
+        methods: {
+            timeOnConfirm(date) {
+                this.timeshow = false;
+                this.timevalue = date;
+            },
+            getList() {
+                var that = this;
+                that.bearingCharts = echarts.init(document.getElementById('bearingCharts'))
+                that.bearingCharts.setOption(that.setData(that.bearingdata))
+
+                that.pullCharts = echarts.init(document.getElementById('pullCharts'))
+                that.pullCharts.setOption(that.setData(that.pulldata))
+            },
+
+            setData(chartsData) {
+                var color = "rgba(32, 64, 255, 1)";
+                /*设置charts参数*/
+                return {
+                    color: color,
+                    grid: { //设置图表位置
+                        top: "10%",
+                        left: 0,
+                        right: 0,
+                        bottom: '3%',
+                        containLabel: true
+                    },
+                    xAxis: {
+                        type: 'category',
+                        //boundaryGap: false,
+                        data: ['1:00', '3:00', '6:00', '9:00', '12:00', '15:00', '18:00', '21:00', '24:00'],
+                        axisLabel: {
+                            show: true,
+                            textStyle: {
+                                fontSize: 8 //更改坐标轴文字大小
+                            }
+                        },
+                    },
+                    yAxis: {
+                        type: 'value',
+                        boundaryGap: [0, '35%']
+                    },
+                    series: [{
+                        data: chartsData,
+                        type: 'line',
+                        smooth: true,
+                        label: {
+                            normal: {
+                                fontSize: 8,
+                                show: true, //折点显示数值,
+                                position: "top"
+                            }
+                        },
+                        symbolSize: 5, //折线点的大小，必须加这个，折点上方的数值才会显示
+                        lineStyle: { //设置阴影
+                            width: 3,
+                            shadowColor: color,
+                            shadowBlur: 10,
+                            shadowOffsetY: 8
+                        }
+                    }]
+                }
+            }
+
+        },
+        filters: {
+            datefmt(date) {
+                if (date) {
+                    return this.moment(date).format('YYYY/MM/DD');
+                } else {
+                    return "";
+                }
+            }
+        }
+
+    });
+</script>

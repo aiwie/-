@@ -1,0 +1,39 @@
+<!--pages/notify/notify.wxml-->
+<wxs src="../../utils/filter.wxs" module="filter"></wxs>
+<custom-navbar title="{{title}}" homePath="/pages/mycompanyproject/mycompanyproject"></custom-navbar>
+<view class="page">
+    <view class="content">
+        <view class="content-title">
+            <text>通知</text>
+        </view>
+        <scroll-view scroll-y style='height: {{windowHeight + "px"}};margin-top: 20rpx;'>
+            <view class="notice">
+                <block wx:for="{{noticesList}}" wx:key="index" wx:for-item="item">
+                    <view class="notice-list" bindtap="noticeDetail" data-index='{{item.noticeId}}'>
+                        <view class="weui-flex notice-list-title">
+                            <view class="weui-flex__item notice-list-title-left">
+                                <text wx:if="{{item.notice==notice}}" class="iconfont icon-gonggao title-info-icon " />
+                                <text wx:elif="{{item.notice==notice}}" class="iconfont icon-xiaoxi title-info-icon " />
+                                <text wx:else class="iconfont icon-chaosong title-info-icon" />
+                                <text>{{item.title}}</text>
+                            </view>
+                        </view>
+                        <view class="notice-list-content">
+                            <text>{{filter.textShear(item.descr,50)}}</text>
+                        </view>
+                        <view class="notice-list-operation">
+                            <view class="weui-flex notice-list-title">
+                                <view class="weui-flex__item notice-list-operation-left">
+                                    <text>发送时间：</text>
+                                    <text>{{item.createDate}}</text>
+                                </view>
+                            </view>
+                        </view>
+                    </view>
+                </block>
+            </view>
+        </scroll-view>
+    </view>
+</view>
+
+<view class="tab-slot"></view>

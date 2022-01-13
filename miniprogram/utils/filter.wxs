@@ -1,0 +1,50 @@
+var formatTime = function (dateStr = '') {
+    if (dateStr == '') {
+        return '';
+    }
+    return dateStr.substring(0, 10);
+}
+
+var textShear = function (str, length) {
+    if (str.length <= length) {
+        return str;
+    } else {
+        return str.substring(0, length) + "..";
+    }
+}
+
+//设备字典
+var deviceDict = function (key) {
+    var dic = {
+        monitor: "视频监控",
+        towercrane: "塔吊监测",
+        elevator: "升降机监测",
+        dischargplat: "卸料平台监测",
+        truckclean: "车辆清洗监测",
+        envi: "环境监测",
+        spray: "喷淋",
+        car: "车辆道闸",
+        facedoor: "人脸门禁"
+    };
+    return dic[key];
+}
+
+//项目类型字典
+var projectTypeDict = function (key) {
+    var dic = {
+        house: "房建",
+        tunnel: "隧道",
+        brideg: "桥梁",
+        subgrade: "路基",
+        depot: "车辆端"
+    };
+    return dic[key];
+}
+
+
+module.exports = {
+    formatTime: formatTime,
+    textShear: textShear,
+    deviceDict: deviceDict,
+    projectTypeDict: projectTypeDict
+}

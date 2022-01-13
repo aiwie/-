@@ -1,0 +1,82 @@
+/* pages/auth/auth.wxss */
+
+page {
+    height: 100%;
+    display: table;
+    background-color: #EEF9FF;
+}
+
+.auth {
+    margin-top: 0;
+    text-align: center;
+    display: table-cell;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 80rpx;
+}
+
+.auth-log {
+    display: inline-block;
+    width: 84rpx;
+    height: 84rpx;
+    text-align: center;
+    line-height: 84rpx;
+    font-size: 24rpx;
+    color: rgba(0, 0, 0, 0.47);
+    background: #FFFFFF;
+    box-shadow: 0px 3px 6px rgba(96, 96, 96, 0.16);
+    border-radius: 50%;
+
+}
+
+.programname {
+    margin-top: 20rpx;
+    font-size: 24rpx;
+    color: #000000;
+}
+
+.auth-img {
+    margin-top: 80rpx;
+    width: 572rpx;
+    height: 446rpx;
+}
+
+.login {
+    margin-top: 60rpx;
+    width: 312rpx;
+    height: 80rpx;
+    text-align: center;
+    font-size: 28rpx;
+    color: #4E4E4E;
+    line-height: 80rpx;
+    border-radius: 2px;
+    background-color: #EEF9FF;
+}
+.privacy{
+    padding: 20px 0 0 40px;
+    font-size: 22rpx;
+    display: flex;
+}
+.priv{
+    display: flex;
+}
+.p-check {
+    width: 35rpx;
+    height: 35rpx;
+}
+.p-check .wx-checkbox-input {
+    width: 25rpx;
+    height: 25rpx;
+}
+.priv-text{
+    color: #2fb8f3;
+}
+.msg-title{
+    margin-bottom: 60rpx;
+    font-size: 25rpx;
+    color: red;
+    top: 20%;
+    left: 30%;
+}

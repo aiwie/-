@@ -1,0 +1,302 @@
+<!--pages/emcs/emcs.wxml-->
+<custom-navbar title="设备监控" homePath="/pages/mycompanyproject/mycompanyproject">
+</custom-navbar>
+<!--顶部导航背景图片-->
+<view class="top-img" style="height:{{cBarHeight}}px;">
+    <view style=" width: 100%;height: 512rpx; position: absolute;z-index:-1;top:0;">
+        <image style="width: 100%;height: 100%;" src="/images/index_top.png"></image>
+    </view>
+</view>
+
+
+<!--预警数据-->
+<view class="banner">
+    <view class="banner_cell">
+        <text>近15日预警数据</text>
+        <view class="banner_cell_echarts" style="z-index:1">
+            <ec-canvas id="csr_mychart" canvas-id="mychart-line" ec="{{ warning_ec }}"></ec-canvas>
+        </view>
+    </view>
+</view>
+
+<!--卡片-->
+<view class="cards">
+    <!--现场人员-->
+    <!--<view class="card">
+        <view class="card-title" style="background: linear-gradient(258deg, #6A85F5 0%, #A298FE 100%);">
+            <text class="iconfont icon-xianchangrenyuanguanli-01 card-title-icon"></text>
+            <text class="card-title-text">现场人员</text>
+        </view>
+        <view class="card-content">
+
+        </view>
+
+    </view>-->
+    <!--视频监控-->
+    <view class="card" catchtap="goWebview" data-index='4'>
+        <view class="card-title" style="background: linear-gradient(270deg, #41BEE3 0%, #55E5E1 100%);">
+            <text class="iconfont icon-shipinjiankong card-title-icon"></text>
+            <text class="card-title-text">视频监控</text>
+        </view>
+        <view class="card-content">
+            <view class="dis-flex card-content-box">
+                <view style="margin-right:160rpx;">
+                    <text class="content-box_text1">在线数</text>
+                    <text class="content-box_text2" style="color: #4CB75A;">{{projectData.monitor.online || 0}}台</text>
+                </view>
+                <view style="margin-right:160rpx;">
+                    <text class="content-box_text1">离线数</text>
+                    <text class="content-box_text2" style="color: #656565;">{{projectData.monitor.offline || 0}}台</text>
+                </view>
+                <view>
+                    <text class="content-box_text1">预警数</text>
+                    <text class="content-box_text2" style="color: #FF0000;">{{projectData.monitor.warnCount || 0}}次</text>
+                </view>
+            </view>
+            <view class="contentline"></view>
+            <view class="card-content-box" style="padding-top: 36rpx;">
+                <text class="content-box_text3" style="margin-right: 40rpx;">监控时长</text>
+                 <text class="content-box_text4">{{projectData.monitor.monitoringTime[0] || 0}}</text>
+                <text class="content-box_text3">天</text>
+                <text class="content-box_text4">{{projectData.monitor.monitoringTime[1] || 0}}</text>
+                <text class="content-box_text3">时</text>
+                <text class="content-box_text4">{{projectData.monitor.monitoringTime[2] || 0}}</text>
+                <text class="content-box_text3">分</text>
+                <text class="content-box_text4">{{projectData.monitor.monitoringTime[3] || 0}}</text>
+                <text class="content-box_text3">秒</text>
+            </view>
+        </view>
+
+
+    </view>
+    <!--视频监控-->
+    <view class="card" catchtap="goWebview" data-index='1'>
+        <view class="card-title" style="background: linear-gradient(90deg, #BFE5F8 0%, #A39DFD 100%);">
+            <text class="iconfont icon-huanjingjiankong- card-title-icon"></text>
+            <text class="card-title-text">环境监测</text>
+        </view>
+        <view class="card-content">
+            <view class="dis-flex card-content-box">
+                <view style="margin-right:160rpx;">
+                    <text class="content-box_text1">在线数</text>
+                    <text class="content-box_text2" style="color: #4CB75A;">{{projectData.envi.online || 0}}台</text>
+                </view>
+                <view style="margin-right:160rpx;">
+                    <text class="content-box_text1">离线数</text>
+                    <text class="content-box_text2" style="color: #656565;">{{projectData.envi.offline || 0}}台</text>
+                </view>
+                <view>
+                    <text class="content-box_text1">预警数</text>
+                    <text class="content-box_text2" style="color: #FF0000;">{{projectData.envi.warnCount || 0}}次</text>
+                </view>
+            </view>
+            <view class="contentline"></view>
+            <view class="card-content-box" style="padding-top: 36rpx;">
+                <text class="content-box_text3" style="margin-right: 40rpx;">监控时长</text>
+                 <text class="content-box_text4">{{projectData.envi.monitoringTime[0] || 0}}</text>
+                <text class="content-box_text3">天</text>
+                <text class="content-box_text4">{{projectData.envi.monitoringTime[1] || 0}}</text>
+                <text class="content-box_text3">时</text>
+                <text class="content-box_text4">{{projectData.envi.monitoringTime[2] || 0}}</text>
+                <text class="content-box_text3">分</text>
+                <text class="content-box_text4">{{projectData.envi.monitoringTime[3] || 0}}</text>
+                <text class="content-box_text3">秒</text>
+            </view>
+        </view>
+    </view>
+    <!--吊塔监控-->
+    <view class="card" catchtap="goWebview" data-index='5'>
+        <view class="card-title" style="background: linear-gradient(90deg, #6BEB8C 0%, #28C983 100%);">
+            <text class="iconfont icon-tadiao card-title-icon"></text>
+            <text class="card-title-text">塔吊监测</text>
+        </view>
+        <view class="card-content">
+            <view class="dis-flex card-content-box" style="padding-top: 24rpx;">
+                <view style="width:280rpx;">
+                    <text class="content-box_text1">在线数</text>
+                    <text class="content-box_text2" style="color: #4CB75A;">{{projectData.towercrane.online || 0}}台</text>
+                </view>
+                <view>
+                    <text class="content-box_text1">离线数</text>
+                    <text class="content-box_text2" style="color: #656565;">{{projectData.towercrane.offline || 0}}台</text>
+                </view>
+            </view>
+            <view class="contentline"></view>
+            <view class="dis-flex card-content-box" style="padding-top: 26rpx;">
+                <view style="width:280rpx;">
+                    <text class="content-box_text1">吊次</text>
+                    <text class="content-box_text2" style="color: #222E6A;">{{projectData.towercrane.workCount || 0}}次</text>
+                </view>
+                <view>
+                    <text class="content-box_text1">预警</text>
+                    <text class="content-box_text2" style="color: #FF0000;">{{projectData.towercrane.warnCount || 0}}次</text>
+                </view>
+            </view>
+        </view>
+    </view>
+    <!--升降机监控-->
+    <view class="card" catchtap="goWebview" data-index='3'>
+        <view class="card-title" style="background: linear-gradient(90deg, #70D1F2 0%, #42A2F8 100%);">
+            <text class="iconfont icon-shengjiangji card-title-icon"></text>
+            <text class="card-title-text">升降机监测</text>
+        </view>
+        <view class="card-content">
+            <view class="dis-flex card-content-box" style="padding-top: 24rpx;">
+                <view style="width:280rpx;">
+                    <text class="content-box_text1">在线数</text>
+                    <text class="content-box_text2" style="color: #4CB75A;">{{projectData.elevator.online || 0}}台</text>
+                </view>
+                <view>
+                    <text class="content-box_text1">离线数</text>
+                    <text class="content-box_text2" style="color: #656565;">{{projectData.elevator.offline || 0}}台</text>
+                </view>
+            </view>
+            <view class="contentline"></view>
+            <view class="dis-flex card-content-box" style="padding-top: 26rpx;">
+                <view style="width:280rpx;">
+                    <text class="content-box_text1">升降</text>
+                    <text class="content-box_text2" style="color: #222E6A;">{{projectData.elevator.workCount || 0}}次</text>
+                </view>
+                <view>
+                    <text class="content-box_text1">预警</text>
+                    <text class="content-box_text2" style="color: #FF0000;">{{projectData.elevator.warnCount || 0}}次</text>
+                </view>
+            </view>
+        </view>
+    </view>
+    <!--卸料平台-->
+    <view class="card" catchtap="goWebview" data-index='7'>
+        <view class="card-title" style="background: linear-gradient(90deg, #EA87F7 0%, #D050FF 100%);">
+            <text class="iconfont icon-xieliao card-title-icon"></text>
+            <text class="card-title-text">卸料平台监测</text>
+        </view>
+        <view class="card-content">
+            <view class="dis-flex card-content-box" style="padding-top: 24rpx;">
+                <view style="width:280rpx;">
+                    <text class="content-box_text1">在线数</text>
+                    <text class="content-box_text2" style="color: #4CB75A;">{{projectData.dischargplat.online || 0}}台</text>
+                </view>
+                <view>
+                    <text class="content-box_text1">离线数</text>
+                    <text class="content-box_text2" style="color: #656565;">{{projectData.dischargplat.offline || 0}}台</text>
+                </view>
+            </view>
+            <view class="contentline"></view>
+            <view class="dis-flex card-content-box" style="padding-top: 26rpx;">
+                <view style="width:280rpx;">
+                    <text class="content-box_text1">卸料次数</text>
+                    <text class="content-box_text2" style="color: #222E6A;">{{projectData.dischargplat.workCount || 0}}次</text>
+                </view>
+                <view>
+                    <text class="content-box_text1">预警</text>
+                    <text class="content-box_text2" style="color: #FF0000;">{{projectData.dischargplat.warnCount || 0}}次</text>
+                </view>
+            </view>
+        </view>
+    </view>
+    <!--未清洗平台-->
+    <view class="card" catchtap="goWebview" data-index='6'>
+        <view class="card-title" style="background: linear-gradient(90deg, #FEA467 0%, #FF619D 100%);">
+            <text class="iconfont icon-penlin card-title-icon"></text>
+            <text class="card-title-text">车辆未清洗监测</text>
+        </view>
+        <view class="card-content">
+            <view class="dis-flex card-content-box" style="padding-top: 24rpx;">
+                <view style="width:280rpx;">
+                    <text class="content-box_text1">在线数</text>
+                    <text class="content-box_text2" style="color: #4CB75A;">{{projectData.truckclean.online || 0}}台</text>
+                </view>
+                <view>
+                    <text class="content-box_text1">离线数</text>
+                    <text class="content-box_text2" style="color: #656565;">{{projectData.truckclean.offline || 0}}台</text>
+                </view>
+            </view>
+            <view class="contentline"></view>
+            <view class="dis-flex card-content-box" style="padding-top: 26rpx;">
+                <view style="width:280rpx;">
+                    <text class="content-box_text1">检测次数</text>
+                    <text class="content-box_text2" style="color: #222E6A;">{{projectData.truckclean.workCount || 0}}次</text>
+                </view>
+                <view>
+                    <text class="content-box_text1">预警</text>
+                    <text class="content-box_text2" style="color: #FF0000;">{{projectData.truckclean.warnCount || 0}}次</text>
+                </view>
+            </view>
+        </view>
+    </view>
+    <!--喷淋设备-->
+    <view class="card" catchtap="goWebview" data-index='2'>
+        <view class="card-title" style="background: linear-gradient(270deg, #8DA4FF 0%, #DBA0FC 100%);">
+            <text class="iconfont icon-qingxi card-title-icon"></text>
+            <text class="card-title-text">喷淋监测</text>
+        </view>
+        <view class="card-content">
+            <view class="dis-flex card-content-box" style="padding-top: 24rpx;">
+                <view style="width:280rpx;">
+                    <text class="content-box_text1">在线数</text>
+                    <text class="content-box_text2" style="color: #4CB75A;">{{projectData.spray.online || 0}}台</text>
+                </view>
+                <view>
+                    <text class="content-box_text1">离线数</text>
+                    <text class="content-box_text2" style="color: #656565;">{{projectData.spray.offline || 0}}台</text>
+                </view>
+            </view>
+            <view class="contentline"></view>
+            <view class="dis-flex card-content-box" style="padding-top: 26rpx;">
+                <view>
+                    <text class="content-box_text1"> 喷淋次数</text>
+                    <text class="content-box_text2" style="color: #222E6A;">{{projectData.spray.workCount || 0}}次</text>
+                </view>
+            </view>
+        </view>
+    </view>
+</view>
+
+<!-- <view style="width:100%;height:300px;">
+
+  	<live-player id="" 
+      autoplay="true"
+      mode="RTC" 
+      src="https://flvopen.ys7.com:9188/openlive/0ee8457db5f844339c94937a363b9659.flv">
+   </live-player>
+
+
+    	<live-player id="" 
+      autoplay="true"
+      mode="live" 
+      src="https://flvopen.ys7.com:9188/openlive/6d279fed157b4aa9ba9bf6aa5b96574a.flv">
+   </live-player>
+
+    	<live-player id="" 
+      autoplay="true"
+      mode="live" 
+      src="https://flvopen.ys7.com:9188/openlive/507505db6b954f5abfa3a7428f6471a9.flv">
+   </live-player>
+
+ 	<live-player id="" 
+      autoplay="true"
+      mode="RTC" 
+      src="https://flvopen.ys7.com:9188/openlive/8c74d86012174a0c9467b9d784b97f50.flv">
+   </live-player>
+
+<live-player id="" 
+      autoplay="true"
+      mode="RTC" 
+      src="https://flvopen.ys7.com:9188/openlive/2a7d7661d0174097a100cb37e4755294.flv">
+   </live-player>
+
+   <live-player id="" 
+      autoplay="true"
+      mode="RTC" 
+      src="https://flvopen.ys7.com:9188/openlive/42fc540eb8954f55b6c4172684b84f7c.flv">
+   </live-player>
+   
+    <live-player id="" 
+      autoplay="true"
+      mode="RTC" 
+      src="https://flvopen.ys7.com:9188/openlive/32b3927350b14f3183e47ddbd10d5894.flv">
+   </live-player>
+
+</view> -->
+
+<view class="tab-slot"></view>

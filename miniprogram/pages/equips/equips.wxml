@@ -1,0 +1,95 @@
+<!--pages/customer/equips.wxml-->
+<wxs src="../../utils/filter.wxs" module="filter"></wxs>
+<!--设备统计-->
+<view class="page">
+    <!-- 头部 -->
+    <view class="top">
+        <image class="top-img" src="/images/index_top.png"></image>
+        <view class="weui-flex">
+            <view class="weui-flex__item top-border">
+                <view class="weui-flex__item ">
+                    <view class="weui-flex">
+                        <view class="weui-flex__item" style="padding-top: 12rpx;">
+                            <view class="top-list-title">
+                                <text>设备</text>
+                            </view>
+                            <view class="top-list-count">
+                                <text style="color: #3bb4c2;">{{deviceAnalysis.faciCount}}</text>
+                            </view>
+                        </view>
+                        <view class="weui-flex__item" style="padding-top: 52rpx;">
+                            <view style="border-left: 1px solid rgba(0, 0, 0, .2)">
+                                <view class="top-list-new">
+                                    <text>活跃</text><text> {{deviceAnalysis.faciActiveCount}}</text>
+                                </view>
+                                <view class="top-list-new" style="padding-top: 20rpx;">
+                                    <text>本月</text><text>+{{deviceAnalysis.faciRise}}</text>
+                                </view>
+                            </view>
+                        </view>
+                    </view>
+                </view>
+            </view>
+        </view>
+    </view>
+
+    <!--统计图-->
+    <view class="chartcontent">
+        <view class="weui-flex">
+            <view class="weui-flex__item">
+                <view class="chartcontent-title">
+                    <text>接入设备分析</text>
+                </view>
+                <view class="chartcontent-content">
+                    <ec-canvas id="add_mychart" canvas-id="mychart-line" ec="{{ csr_ec }}"></ec-canvas>
+                </view>
+            </view>
+            <view class="weui-flex__item" style="margin-left: 16rpx;">
+                <view class="chartcontent-title">
+                    <text>每月活跃设备数</text>
+                </view>
+                <view class="chartcontent-content">
+                    <ec-canvas id="active_mychart" canvas-id="mychart-line" ec="{{ csr_ec }}"></ec-canvas>
+                </view>
+            </view>
+        </view>
+    </view>
+
+    <!--设备详情-->
+    <view class="footer">
+        <view class="customer">
+            <view class="customer-title">
+                <text>设备</text>
+            </view>
+            <!--搜索框-->
+            <view class="searchbar">
+                <view class="weui-search-bar weui-search-bar_focusing" id="searchBar">
+                    <form class="weui-search-bar__form">
+                        <view class="weui-search-bar__box">
+                            <i class="weui-icon-search"></i>
+                            <input type="text" class="weui-search-bar__input" placeholder="请输入关键字" value="{{inputVal}}"
+                                focus="{{inputShowed}}" bindinput="inputTyping" bindconfirm="search" />
+                            <span class="weui-icon-clear" wx:if="{{inputVal.length > 0}}" bindtap="clearInput"></span>
+                        </view>
+                        <label class="weui-search-bar__label" bindtap="showInput">
+                            <i class="weui-icon-search"></i>
+                            <span class="weui-search-bar__text">搜索</span>
+                        </label>
+                    </form>
+                </view>
+            </view>
+            <!--设备列表-->
+            <block wx:for="{{deviceAnalysisCate}}" wx:key="key" wx:for-item="item" wx:for-index="index">
+                <view class="device-list">
+                    <view class="flex-x-between">
+                        <view class="device-name">{{filter.deviceDict(item.faciCategory)}}</view>
+                        <view class="device-count">{{item.faciCount}}</view>
+                    </view>
+                    <view class="device-chart">
+                        <ec-canvas id="device_mychart_{{index}}" canvas-id="mychart-line" ec="{{ csr_ec }}"></ec-canvas>
+                    </view>
+                </view>
+            </block>
+        </view>
+    </view>
+</view>

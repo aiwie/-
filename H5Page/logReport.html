@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <!--jquery-->
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+  <!--微信-->
+  <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.3.2.js"></script>
+  <!-- Vant -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@2.12/lib/index.css" />
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6/dist/vue.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vant@2.12/lib/vant.min.js"></script>
+  <!--阿里巴巴图标-->
+  <link rel="stylesheet" href="js/iconfont/iconfont.css" />
+  <!--axios-->
+  <script src="https://cdn.jsdelivr.net/npm/axios@0.21.4/dist/axios.min.js"></script>
+  <!--高德地图-->
+  <script
+    src="https://webapi.amap.com/maps?v=1.4.15&key=aaf1ef61096f6ec64b68ee37491572d7&plugin=AMap.PolyEditor,AMap.CircleEditor,AMap.Geocoder,AMap.MouseTool,AMap.MarkerClusterer,AMap.DistrictSearch">
+    </script>
+  <!--地点位置数据-->
+  <script src="js/arealist.js"></script>
+  <title>上报施工日志</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    /* 表单-Start*/
+    .form {
+      margin: 15px;
+      margin-bottom: 70px;
+    }
+
+    .van-cell {
+      margin-top: 8px;
+      background: #F1F3F5;
+      border-radius: 8px;
+    }
+
+    /*今日天气*/
+    .weather {
+      margin-top: 12px;
+      padding: 20px 9px 23px 11px;
+      color: #FFFFFF;
+      background: url(image/weather-image.png);
+      background-repeat: no-repeat;
+      background-size: 100% 100%;
+      background-size: cover;
+      border-radius: 8px;
+    }
+
+    .weather .van-divider {
+      margin: 10px 0;
+    }
+
+    .realtime-weather {
+      width: 100%;
+      white-space: nowrap;
+      overflow-y: auto;
+      /*可滑动*/
+    }
+
+    .realtime-weather::-webkit-scrollbar {
+      display: none;
+    }
+
+    .realtime-weather-item {
+      width: 50px;
+      display: inline-block;
+      text-align: center;
+      line-height: 20px;
+
+    }
+
+    .realtime-weather-item p {
+      font-size: 12px;
+      color: seashell;
+    }
+
+    .realtime-weather-item i {
+      font-size: 18px;
+    }
+
+
+    .voice {
+      margin-top: 8px;
+      line-height: 42px;
+      height: 42px;
+      background: #F1F3F5;
+      opacity: 0.6;
+      border-radius: 8px;
+    }
+
+    .voice i {
+      margin-top: 0px;
+      font-size: 20px;
+      margin-left: 10px;
+      margin-right: 10px;
+    }
+
+    .voice span {
+      font-size: 16px;
+      color: #8A8A8A;
+    }
+
+    #container {
+      width: 100%;
+      height: 150px;
+      margin-top: 5px;
+    }
+
+
+    /* 表单-End */
+
+
+    /* 确认按钮-Start*/
+    .button {
+      z-index: 99999;
+      position: fixed;
+      width: 100%;
+      height: 60px;
+      bottom: 0;
+      background: #F2F2F2;
+      border-top: 1px solid #E2E2E2;
+    }
+
+    /* 确认按钮-End */
+  </style>
+</head>
+
+<body>
+  <div id="contain">
+    <!--表单-->
+    <van-form class="form">
+      <!--日志名称-->
+      <h4>标题</h4>
+      <van-field v-model="name" label="标题" placeholder="请输入标题名称" input-align="right"></van-field>
+
+      <!--今天天气-->
+      <div class="weather">
+        <van-row type="flex" justify="space-between" class="weather-geog">
+          <van-col>
+            <p style=" font-size: 14px;">{{weather.city}}</p>
+            <p style=" font-size: 20px;">{{weatherdata.tem}}℃</p>
+          </van-col>
+          <van-col style="text-align: right;">
+            <p style="font-size: 12px;">{{weatherdata.wea}}</p>
+            <p style="font-size: 14px;">{{weatherdata.tem2}}℃~{{weatherdata.tem1}}℃</p>
+          </van-col>
+        </van-row>
+        <van-divider :style="{ color: '#F2F2F2', borderColor: '#F2F2F2'}"></van-divider>
+        <div class="realtime-weather">
+          <template v-for="(item,index) in weatherdata.hours">
+            <div class="realtime-weather-item">
+              <p>{{item.hours}}</p>
+              <i class="iconfont icon-tq_01qing"></i>
+              <p>{{item.tem}}℃</p>
+            </div>
+          </template>
+        </div>
+      </div>
+
+      <!--日志内容-->
+      <h4 style="margin-top: 10px;">日志内容</h4>
+      <van-field v-model="content" rows="2" autosize type="textarea" maxlength="100" placeholder="请输入日志内容"
+        show-word-limit></van-field>
+      <van-divider></van-divider>
+
+      <!--语言输入-->
+      <!-- <h4>语音输入</h4>
+      <div class="voice">
+        <i class="iconfont icon-yuyin"></i><span> 按住说话</span>
+      </div>
+      <van-divider></van-divider> -->
+
+      <!--日志图片-->
+      <h4>图片</h4>
+      <van-row type="flex" style="margin-top: 10px;">
+        <van-uploader v-model="images" :before-read="uploadImage" :capture="mobilePhone == 'ios' ? '' : 'camera'"
+          multiple></van-uploader>
+      </van-row>
+      <van-divider></van-divider>
+
+      <!--地点-->
+      <van-row type="flex" justify="space-between">
+        <van-col>
+          <h4>地点</h4>
+        </van-col>
+
+      </van-row>
+      <van-cell title="日志地址" is-link name="problemlocation" :value="areaName==''?'选择日志地址':areaName"
+        @click="areashow = true">
+      </van-cell>
+      <van-field style="margin-top: 1px;" v-model="address" label="详细地址" placeholder="请输入详细地址或点击地图" input-align="right">
+      </van-field>
+      <div id="container"> </div>
+      <van-divider></van-divider>
+
+    </van-form>
+
+    <!--确认按钮-->
+    <div class="button" v-show="!areashow">
+      <van-row type="flex" justify="space-around" style="height: 100%;align-items:center;">
+        <van-col span="11">
+          <van-button type="info" block round color="#C5C8D2" @click="goBackUrl">取消</van-button>
+        </van-col>
+        <van-col span="11">
+          <van-button type="info" block round color="#6A8AF0" v-on:click="submitForm">提交</van-button>
+        </van-col>
+      </van-row>
+    </div>
+
+    <!--底部弹出选项-->
+    <van-popup v-model="areashow" position="bottom">
+      <van-area @confirm="areaOnConfirm" title="日志地址" :area-list="areaList"></van-area>
+    </van-popup>
+
+  </div>
+</body>
+
+<script src="./js/public.js"></script>
+<script type="text/javascript">
+  var vm = new Vue({
+    el: "#contain",
+    data: {
+      platCode: getUrlParam('platCode'),
+      corpCode: getUrlParam('corpCode'),
+      projectCode: getUrlParam('projectCode'),
+      token: getUrlParam('token'),
+      userCode: getUrlParam('userCode'),
+      userName: getUrlParam('userName'),
+      projectId: getUrlParam('projectId'),
+      mobilePhone: getUrlParam('mobilePhone'),
+      apiUrl: 'https://site.tieweizhixing.com/',
+      adcode: '', //城市编码
+      name: getUrlParam('userName') + '施工日志', //日志名称
+      weather: [], //当前位置天气信息
+      weatherdata: [],//当日天气详情
+      content: '',//日志内容
+      // sounds: ['test.mp3'],//声音
+      images: [],
+      areaList: areaList, //地点
+      areashow: false, //显示问地点
+      areaName: '', //地点显示名称
+      address: '', //详细地址
+      formData: { //表单数据
+        platCode: getUrlParam('platCode'), //平台代码
+        corpCode: getUrlParam('corpCode'), //公司代码
+        projectCode: getUrlParam('projectCode'), //项目代码
+        userCode: getUrlParam('userCode'), //上报人编码
+        userName: decodeURI(getUrlParam('userName')), //上报人姓名
+        reportTypeCode: "worklog", //上报类型:安全问题safety,质量问题quality,班前培训classtrain,施工日志worklog
+        reportGps: '', //地点gps定位
+        reportDate: new Date(), //报告日期
+        content: [], //不同类型需上报的数据
+      },
+    },
+    created() {
+    },
+    mounted() {
+      console.log(this.mobilePhone);
+      this.getProjectList()
+      this.getWeather();
+    },
+    methods: {
+      getProjectList() { // 调用 整个项目记录
+        axios.post(this.apiUrl + "/token-service/project/20/selectEmployeeProjectList", {
+          token: this.token
+        })
+          .then(res => {
+            if (res.data.code == '1') {
+              res.data.data.list.forEach(item => {
+                if (item.projectId == this.projectId) {
+                  // this.formData.reportGps = [JSON.parse(item.gpsFence)[0].lng, JSON.parse(item.gpsFence)[0].lat]
+                  electronicRail(JSON.parse(item.gpsFence))
+                  fistRegeoCode(JSON.parse(item.gpsFence)[0].lng, JSON.parse(item.gpsFence)[0].lat)
+                }
+              })
+            } else {
+              console.log('整个项目记录');
+            }
+          })
+          .catch(err => {
+          })
+      },
+      getWeather() { //获取当前位置天气信息
+        //获取实时天气
+        axios.get('https://www.tianqiapi.com/api/?version=v9&appid=65591251&appsecret=E48o0Egc')
+          .then(res => {
+            this.weather = res.data;
+            this.weatherdata = res.data.data[0];
+          })
+          .catch(err => {
+            console.error(err);
+          })
+      },
+      uploadImage(file) { //图片上传  
+        var that = this;
+        var formData = new FormData();
+        formData.append("token", that.token);
+        formData.append("uploadPath", 'worklogImage');
+        formData.append("myfiles0", file);
+        axios.post(that.apiUrl + "file-service/upload/uploadfiles", formData)
+          .then(res => {
+            var data = {
+              url: res.data.data.myfiles0
+            };
+            that.images.push(data)
+          })
+          .catch(err => {
+            Toast.$fail(err);
+          })
+      },
+      areaOnConfirm(date) { //地区选择
+        var that = this;
+        var areaname = '';
+        date.forEach(item => {
+          areaname += item.name + "\xa0"
+        });
+        that.areaName = areaname;
+        that.areashow = false;
+
+        geoCode(areaname);
+      },
+      submitForm() {//提交
+        var that = this;
+        if (that.formValidator()) {
+          return;
+        }
+        var params = that.formData;
+        var content = that.setFormContent();
+        params["content"] = content;
+        axios.post(that.apiUrl + "projectservice/report/20/addReportData", params)
+          .then(res => {
+            if (res.data.code == '1') {
+              that.$toast.success('上报成功！');
+              that.goBackUrl()
+            } else {
+              that.$toast(res.data.msg);
+              return;
+            }
+          })
+          .catch(err => {
+            console.error(err);
+          })
+      },
+      goBackUrl() { // 取消返回上一层
+        window.history.go(-1)
+      },
+      formValidator() {
+        var that = this;
+        if (that.name == '') {
+          that.$toast.fail('请输入日志名称！');
+          return true;
+        }
+        if (that.content == '') {
+          that.$toast.fail('请输日志内容！');
+          return true;
+        }
+        // if (that.sounds.length <= 0) {
+        //   that.$toast.fail('没有输入任何语言！');
+        //   return true;
+        // }
+        if (that.images.length <= 0) {
+          that.$toast.fail('请上传问题图片！');
+          return true;
+        }
+        if (that.formData.reportGps == '') {
+          that.$toast.fail('请选择地点！');
+          return true;
+        }
+        if (that.address == '') {
+          that.$toast.fail('请输入详细地址！');
+          return true;
+        }
+        return false;
+      },
+      setFormContent() { //设置表单内容
+        var that = this;
+        var images = [];
+        that.images.forEach(item => {
+          images.push(item.url)
+        });
+        return {
+          data: [{
+            "key": "name",
+            "name": "日志名称",
+            "value": that.name
+          },
+          {
+            "key": "weather",
+            "name": "天气",
+            "value": that.weatherdata.wea + that.weatherdata.tem + "℃"
+          },
+          {
+            "key": "content",
+            "name": "日志内容",
+            "value": that.content
+          },
+          // {
+          //   "key": "sounds",
+          //   "name": "sounds",
+          //   "value": that.sounds
+          // },
+          {
+            "key": "image",
+            "name": "图片",
+            "value": images
+          },
+          {
+            "key": "address",
+            "name": "我的位置",
+            "value": that.address
+          }]
+        };
+      },
+    },
+
+  });
+
+  var map = new AMap.Map("container", {
+    resizeEnable: true, //启用调整大小
+    dragEnable: true, //拖动
+    zoom: 10,
+  });
+
+  // AMap.plugin('AMap.Geolocation', function () {
+  //     var geolocation = new AMap.Geolocation({
+  //         enableHighAccuracy: true, //是否使用高精度定位，默认:true
+  //         timeout: 10000, //超过10秒后停止定位，默认：5s
+  //         buttonPosition: 'RB', //定位按钮的停靠位置
+  //         buttonOffset: new AMap.Pixel(10, 20), //定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
+  //         zoomToAccuracy: true, //定位成功后是否自动调整地图视野到定位点
+  //     });
+  //     map.addControl(geolocation);
+  // });
+
+  var lnglats = [];
+  var markers = [];
+  var marker = new AMap.Marker();
+  var geocoder = new AMap.Geocoder({});
+
+
+  // 设置地图中心的及层级 - 电子围栏
+  function electronicRail(val) {
+    let newGpsFen = []
+    val.forEach(item => {
+      newGpsFen.push([item.lng, item.lat])
+    })
+    var polygon = new AMap.Polygon({
+      path: newGpsFen,
+      fillColor: '#5ea8e699', // 多边形填充颜色
+      strokeColor: '#fff', // 线条颜色
+      map: map
+    })
+    this.contentGps = polygon.getBounds().getCenter()
+    this.map.setFitView([polygon], true)
+    showInfo(polygon)
+  }
+  /*设置覆盖物点标记*/
+  function showInfo(polygon) {
+    polygon.on('click', function (e) {
+      clear();
+      if (lnglats.length < 1) {
+        lnglats.push(e.lnglat);
+        var index = lnglats.length;
+        marker.setPosition(e.lnglat);
+        markers.push(marker);
+        map.add(marker);
+        vm.formData.reportGps = lnglats[0].lng + ',' + lnglats[0].lat
+        regeoCode()
+      }
+    });
+  }
+  /*设置点标记*/
+  // map.on('click', function (e) {
+  //   clear();
+  //   if (lnglats.length < 1) {
+  //     lnglats.push(e.lnglat);
+  //     var index = lnglats.length;
+  //     marker.setPosition(e.lnglat);
+  //     markers.push(marker);
+  //     map.add(marker);
+  //     regeoCode()
+  //   }
+  // });
+  /*删除位置*/
+  function clear() {
+    map.remove(markers);
+    markers = [];
+    lnglats = [];
+  };
+  /*经纬度转地址*/
+  function regeoCode() {
+    geocoder.getAddress(lnglats, function (status, result) {
+      var address = []
+      vm.address = ''
+      if (status === 'complete' && result.regeocodes.length) {
+        for (var i = 0; i < result.regeocodes.length; i += 1) {
+          if (!vm.address) {
+            vm.address = result.regeocodes[i].formattedAddress;
+          }
+        }
+      } else {
+        console.error(result)
+      }
+    });
+  }
+  /*地址转经纬度*/
+  function geoCode(address) {
+    geocoder.getLocation(address, function (status, result) {
+      if (status === 'complete' && result.geocodes.length) {
+        var lnglat = result.geocodes[0].location
+        vm.formData.reportGps = lnglat.lng + ',' + lnglat.lat;
+        marker.setPosition(lnglat);
+        // map.add(marker);
+        map.setFitView(marker);
+        clear()
+      } else {
+        console.error(result)
+      }
+    });
+  }
+  /*首次经纬度转地址*/
+  function fistRegeoCode(lng, lat) {
+    let coorList = [lng, lat]
+    geocoder.getAddress(coorList, function (status, result) {
+      if (status === 'complete' && result.regeocode) {
+        vm.areaName = result.regeocode.addressComponent.province + ' ' + result.regeocode.addressComponent.city + ' ' + result.regeocode.addressComponent.district
+      } else {
+        console.error(result)
+      }
+    });
+  }
+</script>
+
+
+</html>
